@@ -15,7 +15,9 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
     variaciones.foreach { variacion => 
       variacion match {
         case (HP,x) => nuevosStats = nuevosStats.copy(hp = actualizarStat(this.hp,x))
-        case (Fuerza,x) => nuevosStats = nuevosStats.copy(fuerza = Math.max(1,x + this.hp))
+        case (Fuerza,x) => nuevosStats = nuevosStats.copy(fuerza = actualizarStat(this.fuerza,x))
+        case (Velocidad,x) => nuevosStats = nuevosStats.copy(velocidad = actualizarStat(this.velocidad,x))
+        case (Inteligencia,x) => nuevosStats = nuevosStats.copy(inteligencia = actualizarStat(this.inteligencia,x))
       }
     }
     nuevosStats
