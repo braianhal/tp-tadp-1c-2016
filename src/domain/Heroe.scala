@@ -12,6 +12,8 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   def modificarStats(variaciones:Stat*) = {
     copy(statsBase = statsBase.actualizarSegun(variaciones.toList))
   }
+
+  def stats():Stats = inventario.efectoSobre(trabajo.efectoSobre(this)).statsBase
   
   def equipar(item:Item):Heroe = {
     if(item.cumpleCondicion(this)){
@@ -20,9 +22,9 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
     this
   }
   
-  def stats():Stats = inventario.efectoSobre(trabajo.efectoSobre(this)).statsBase
+  def asignarTrabajo(trabajoNuevo:Trabajo) = copy(trabajo = trabajoNuevo)
   
-  
+  def perderTrabajo = asignarTrabajo(SinTrabajo)
 }
 
 
@@ -124,12 +126,16 @@ abstract class Trabajo {
   def efectoSobre(heroe:Heroe):Heroe
 }
 
-case class TrabajoEfectivo(val statPrincipal:Stat,val otrosStats:Stat*) extends Trabajo{
+class TrabajoEfectivo(val statPrincipal:Stat,val otrosStats:Stat*) extends Trabajo{
   
   override def statsAfectados = statPrincipal::otrosStats.toList
   
   override def efectoSobre(heroe:Heroe):Heroe = heroe.modificarStats(statsAfectados:_*)
 }
+
+case object Guerrero extends TrabajoEfectivo(Fuerza(+15),HP(+10),Inteligencia(-10))
+case object Mago extends TrabajoEfectivo(Inteligencia(+20),Fuerza(-20))
+case object Ladron extends TrabajoEfectivo(Velocidad(+10),HP(-5))
 
 case object SinTrabajo extends Trabajo {
   def statsAfectados() = List()

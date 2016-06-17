@@ -19,7 +19,8 @@ class HeroeTest {
      cascoVikingo = Item(Cabeza,(_.fuerzaBase > 30),(_ => List(HP(+10))))
   }
   
-
+  
+  //Stats
   @Test
   def heroeSeCreaConStatsBase() = {
     assertEquals(heroe.statsBase, Stats(10,20,30,40))
@@ -75,10 +76,55 @@ class HeroeTest {
   }
   
   
+  //Trabajo
+  @Test
+  def noTenerTrabajoNoCambiaLosStats(){
+    val heroeSinTrabajo = heroe.asignarTrabajo(SinTrabajo)
+    assertEquals(heroeSinTrabajo.statsBase,heroeSinTrabajo.stats())
+  }
+  
+  @Test
+  def heroeConTrabajoDeGuerrero(){
+    val heroeConTrabajo = heroe.asignarTrabajo(Guerrero)
+    assertEquals(heroeConTrabajo.hpBase+10,heroeConTrabajo.stats().hp)
+    assertEquals(heroeConTrabajo.fuerzaBase+15,heroeConTrabajo.stats().fuerza)
+    assertEquals(heroeConTrabajo.inteligenciaBase-10,heroeConTrabajo.stats().inteligencia)
+    assertEquals(heroeConTrabajo.velocidadBase,heroeConTrabajo.stats().velocidad)
+  }
+  
+  @Test
+  def heroeConTrabajoDeMago(){
+    val heroeConTrabajo = heroe.asignarTrabajo(Mago)
+    assertEquals(heroeConTrabajo.hpBase,heroeConTrabajo.stats().hp)
+    assertEquals(1,heroeConTrabajo.stats().fuerza) // daría 0, pero el mínimo es 1
+    assertEquals(heroeConTrabajo.inteligenciaBase+20,heroeConTrabajo.stats().inteligencia)
+    assertEquals(heroeConTrabajo.velocidadBase,heroeConTrabajo.stats().velocidad)
+  }
+  
+  @Test
+  def heroeConTrabajoDeLadron(){
+    val heroeConTrabajo = heroe.asignarTrabajo(Ladron)
+    assertEquals(heroeConTrabajo.hpBase-5,heroeConTrabajo.stats().hp)
+    assertEquals(heroeConTrabajo.fuerzaBase,heroeConTrabajo.stats().fuerza) // daría 0, pero el mínimo es 1
+    assertEquals(heroeConTrabajo.inteligenciaBase,heroeConTrabajo.stats().inteligencia)
+    assertEquals(heroeConTrabajo.velocidadBase+10,heroeConTrabajo.stats().velocidad)
+  }
+  
+  @Test
+  def quedarseSinTrabajo(){
+    val heroeConTrabajo = heroe.asignarTrabajo(Ladron)
+    val heroeSinTrabajo = heroeConTrabajo.perderTrabajo
+    
+    assertNotEquals(heroeConTrabajo.statsBase,heroeConTrabajo.stats())
+    assertEquals(heroeSinTrabajo.statsBase,heroeSinTrabajo.stats())
+  }
+  
+  
+  //Inventario
   @Test
   def equiparCascoVikingo(){
     val otroHeroeConCasco = superHeroe.equipar(cascoVikingo)
-    assertEquals(otroHeroeConCasco.stats().hp, superHeroe.hpBase + 10)
+    assertEquals(superHeroe.hpBase + 10,otroHeroeConCasco.stats().hp)
   }
   
   @Test
