@@ -56,10 +56,10 @@ class EquipoTest {
 
   
   //Lider
-  /*@Test
+  @Test
   def liderDeEquipo() = {
     assertEquals(Some(lider), equipo.lider)
-  }*/
+  }
   
   @Test
   def equipoVacioNoTieneLider() = {
@@ -68,7 +68,7 @@ class EquipoTest {
   
   @Test
   def siHayMasDeUnLiderNingunoLoEs() = {
-    val otroLider = Heroe(Stats(18,22,64,50)).asignarTrabajo(Mago)
+    val otroLider = Heroe(Stats(18,22,64,45)).asignarTrabajo(Mago)
     val equipoModificado = equipo.obtenerMiembro(otroLider)
     assertEquals(None, equipoModificado.lider)
   }

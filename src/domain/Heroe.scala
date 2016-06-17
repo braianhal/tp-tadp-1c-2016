@@ -52,6 +52,8 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   def actualizarStat(valorAnterior:Int,variacion:Int) = Math.max(1,variacion + valorAnterior)
   
   def toList = List(HP(hp),Fuerza(fuerza),Velocidad(velocidad),Inteligencia(inteligencia))
+  
+  def valorDe(stat:Stat) = this.toList.find { _.getClass() == stat.getClass() }.get.valor
 }
 
 

@@ -86,7 +86,7 @@ class HeroeTest {
   //Trabajo
   @Test
   def noTenerTrabajoNoCambiaLosStats(){
-    val heroeSinTrabajo = heroe.asignarTrabajo(SinTrabajo)
+    val heroeSinTrabajo = heroe.perderTrabajo
     assertEquals(heroeSinTrabajo.statsBase,heroeSinTrabajo.stats())
   }
   

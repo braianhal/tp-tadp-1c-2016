@@ -8,7 +8,6 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
   
   def reemplazarMiembro(actual:Heroe,nuevo:Heroe):Equipo = copy(heroes = nuevo::heroes.filterNot { _ == actual })
   
-  //FIXME no esta andando en todos los casos
   def lider:Option[Heroe] = {
     heroes.sortBy { _.valorStatPrincipal }.reverse match {
       case List() => None
