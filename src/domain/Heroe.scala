@@ -1,9 +1,7 @@
 package domain
 
-case class Heroe(statsBase:Stats) {  //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
-  
-  
-  val inventario:Inventario = Inventario()
+case class Heroe(statsBase:Stats,inventario:Inventario = Inventario()) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
+
   val trabajo:Trabajo = null
 
   
@@ -11,12 +9,12 @@ case class Heroe(statsBase:Stats) {  //hay que validar que no sean menores a 1.p
     copy(statsBase.actualizarSegun(variaciones.toList))
   }
   
-  def equipar(item:Item) {
+  def equipar(item:Item):Heroe = {
     if(item.cumpleCondicion(this)){
-      inventario.agregar(item)
+      return inventario.agregarA(this,item)
     }
+    this
   }
-  
   
   
 }
@@ -39,12 +37,36 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   def actualizarStat(valorAnterior:Int,variacion:Int) = Math.max(1,variacion + valorAnterior)
 }
 
-case class Inventario(){
+case class Inventario(items:List[Item] = List()){
   
-  val items:List[Item] = List()
+  def agregarA(heroe:Heroe,item:Item):Heroe = {
+    actualizarInventario(heroe,
+      item.tipo match {
+        case Talisman => item::items
+        case Mano(false) => agregarItemDeMano(item)
+        case Mano(true) => agregarItemDeMano(item)
+        case _ => reemplazarOAgregar(item,items)
+      })
+  }
   
-  def agregar(item:Item) {
-    
+  def actualizarInventario(heroe:Heroe,itemsActualizados:List[Item]):Heroe = {
+    heroe.copy(inventario = copy(items = itemsActualizados))
+  }
+  
+  def agregarItemDeMano(item:Item):List[Item] = {
+    var itemsActualizados = items.filterNot { i => i.tipo == Mano(true) }
+    if(items.count { i => i.tipo == Mano(false) } == 2){
+      return reemplazarOAgregar(item,itemsActualizados)
+    }
+    item::itemsActualizados
+  }
+  
+  def soloUnItemDeMano(items:List[Item]):List[Item] = {
+    (items.find { i => i.tipo == Mano(false) }).get::items.filterNot { i => i.tipo == Mano(false) }
+  }
+  
+  def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
+    item::items.filterNot { i => i.tipo == item.tipo }
   }
   
 }
@@ -71,8 +93,8 @@ case class Item(tipo:TipoItem,efectoSobreHeroe:(Heroe => List[(Stat,Int)]),condi
   
 }
 
-trait TipoItem
-case object Cabeza
-case object Torso
-case class Mano(cantidad:Int)
-case object Talisman
+class TipoItem
+case object Cabeza extends TipoItem
+case object Torso extends TipoItem
+case class Mano(dosManos:Boolean = false) extends TipoItem
+case object Talisman extends TipoItem
