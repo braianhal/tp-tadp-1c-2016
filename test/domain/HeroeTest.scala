@@ -9,10 +9,10 @@ class HeroeTest {
   val heroe = Heroe(Stats(10,20,30,40))
   val superHeroe = Heroe(Stats(100,100,100,100))
   val casiHeroe = Heroe(Stats(5,5,5,5))
-  val cascoVikingo = Item(Cabeza,(_ => List(HP(+10))),(_.fuerzaBase > 30))
-  val palitoMagico = Item(Mano(),
-      (_ => List(HP(+20))),
-      (heroe => heroe.es(Mago) || (heroe.es(Ladron) && heroe.inteligenciaBase > 30)))
+  val cascoVikingo = Item(Cabeza,efectos.modificarHP(+10),condiciones.fuerzaBaseMayorA(30))
+  val palitoMagico = Item(Mano(),efectos.modificarInteligencia(+20),
+      (heroe => heroe.es(Mago) || (heroe.es(Ladron) && condiciones.inteligenciaBaseMayorA(30)(heroe))))
+  val armaduraEleganteSport = Item(Torso,( heroe => efectos.modificarVelocidad(+30)(heroe) ++ efectos.modificarHP(-30)(heroe)) )
   
   @Before
   def setup() = {
@@ -134,5 +134,23 @@ class HeroeTest {
     assertEquals(casiHeroe.statsBase,casiHeroe.stats())
   }
 
+  @Test
+  def equiparPalitoMagico(){
+    val magoConPalitoMagico = superHeroe.asignarTrabajo(Mago).equipar(palitoMagico)
+    assertEquals(superHeroe.inteligenciaBase + 20 + 20, magoConPalitoMagico.stats().inteligencia)
+  }
   
+  @Test
+  def noCumpleCondicionParaEquiparPalitoMagico(){
+    val heroeMuggle = superHeroe.equipar(palitoMagico)
+    assertFalse(heroeMuggle.inventario.tiene(palitoMagico))
+    assertEquals(heroeMuggle.statsBase,heroeMuggle.stats())
+  }
+  
+  @Test
+  def equiparArmaduraEleganteSport(){
+    val heroeConArmadura = superHeroe.equipar(armaduraEleganteSport)
+    assertEquals(superHeroe.velocidadBase + 30, heroeConArmadura.stats().velocidad)
+    assertEquals(superHeroe.hpBase - 30, heroeConArmadura.stats().hp)
+  }
 }
