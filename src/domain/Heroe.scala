@@ -69,7 +69,8 @@ case class Inventario(items:List[Item] = List()){
     actualizarInventario(heroe,
       item.tipo match {
         case Talisman => item::items
-        case Mano(_) => agregarItemDeMano(item)
+        case Mano(false) => agregarItemDeMano(item)
+        case Mano(true) => item::sinItemsDeMano
         case _ => reemplazarOAgregar(item,items)
       })
   }
@@ -88,6 +89,8 @@ case class Inventario(items:List[Item] = List()){
 
     item::itemsActualizados
   }
+  
+  def sinItemsDeMano:List[Item] = items.filterNot { i => i.tipo == Mano(false) || i.tipo == Mano(true) }
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
     item::items.drop(1)
