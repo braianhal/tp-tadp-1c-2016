@@ -26,11 +26,14 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   def perderTrabajo = asignarTrabajo(SinTrabajo)
   
   def es(unTrabajo:Trabajo) = trabajo == unTrabajo
+  
+  def valorStatPrincipal = trabajo.valorStatPrincipal(this)
+  
 }
 
 
 
-
+// FIXME sospecho que sería mejor tener una lista de tuplas
 case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   
   def actualizarSegun(variaciones:List[Stat]) = {
@@ -52,11 +55,11 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
 }
 
 
-abstract class Stat(valor:Int)
-case class HP(valor:Int) extends Stat(valor)
-case class Fuerza(valor:Int) extends Stat(valor)
-case class Velocidad(valor:Int) extends Stat(valor)
-case class Inteligencia(valor:Int) extends Stat(valor)
+abstract class Stat(val valor:Int)
+case class HP(v:Int) extends Stat(v)
+case class Fuerza(v:Int) extends Stat(v)
+case class Velocidad(v:Int) extends Stat(v)
+case class Inteligencia(v:Int) extends Stat(v)
 
 
 
@@ -98,7 +101,7 @@ case class Inventario(items:List[Item] = List()){
 }
 
 
-case class Item(tipo:TipoItem,efectoSobre:(Heroe => List[Stat]),condicion:(Heroe => Boolean) = (_ => true)) {
+case class Item(tipo:TipoItem,efectoSobre:(Heroe => List[Stat]),condicion:(Heroe => Boolean) = (_ => true),precio:Int = 1) {
   
   def cumpleCondicion(heroe:Heroe):Boolean = {
     condicion(heroe)
@@ -122,22 +125,29 @@ case object Talisman extends TipoItem
 abstract class Trabajo {
   def statsAfectados():List[Stat]
   def efectoSobre(heroe:Heroe):Heroe
+  def valorStatPrincipal(heroe:Heroe):Int
 }
 
 class TrabajoEfectivo(val statPrincipal:Stat,val otrosStats:Stat*) extends Trabajo{
   
-  override def statsAfectados = statPrincipal::otrosStats.toList
+  def statsAfectados = statPrincipal::otrosStats.toList
   
-  override def efectoSobre(heroe:Heroe):Heroe = heroe.modificarStats(statsAfectados:_*)
+  def efectoSobre(heroe:Heroe):Heroe = heroe.modificarStats(statsAfectados:_*)
+  
+  //FIXME deberia devolver el valor del stat principal del trabajo de los stats() del heroe
+  def valorStatPrincipal(heroe:Heroe) = 2
+  
 }
 
 case object Guerrero extends TrabajoEfectivo(Fuerza(+15),HP(+10),Inteligencia(-10))
 case object Mago extends TrabajoEfectivo(Inteligencia(+20),Fuerza(-20))
 case object Ladron extends TrabajoEfectivo(Velocidad(+10),HP(-5))
 
+//FIXME cambiarlo por un try, option o algo así
 case object SinTrabajo extends Trabajo {
   def statsAfectados() = List()
   def efectoSobre(heroe:Heroe):Heroe = heroe
+  def valorStatPrincipal(heroe:Heroe) = 0
 }
 
 
