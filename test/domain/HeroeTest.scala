@@ -16,6 +16,11 @@ class HeroeTest {
   val arcoViejo = Item(Mano(true),efectos.modificarFuerza(+2))
   val escudoAntiRobo = Item(Mano(),efectos.modificarHP(+20),condiciones.aptoParaEscudoAntiRobo)
   
+  val bazooka = Item(Mano(true),( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),(heroe => heroe.es(Guerrero)))
+  val espadaChica = Item(Mano(),efectos.modificarFuerza(+10),(heroe => (heroe.es(Guerrero))))
+  val lanza = Item(Mano(),( heroe => efectos.modificarVelocidad(+10)(heroe) ++ efectos.modificarFuerza(+10)(heroe)),(heroe => (heroe.es(Guerrero))))
+  
+  
   @Before
   def setup() = {
      
@@ -160,6 +165,38 @@ class HeroeTest {
     val ladronConPalitoMagico = superHeroe.asignarTrabajo(Ladron).equipar(palitoMagico)
     assertEquals(superHeroe.inteligenciaBase + 20, ladronConPalitoMagico.stats().inteligencia)
   }
+  
+  
+  @Test
+  def heroeEquipaUnArmaDeDosManosYlaDescartaPorUna(){ 
+    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(bazooka).equipar(espadaChica)
+    assertTrue(heroeArmado.inventario.tiene(espadaChica))
+    assertFalse(heroeArmado.inventario.tiene(bazooka))
+    assertEquals(Stats(20,45,30,30),heroeArmado.stats())
+  }
+
+  @Test
+  def heroeEquipaUnArmaDeUnaManoYlaDescartaPorUnaDeDos(){ 
+    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(lanza).equipar(bazooka)
+    assertTrue(heroeArmado.inventario.tiene(bazooka))
+    assertFalse(heroeArmado.inventario.tiene(lanza))
+    assertEquals(Stats(20,135,1,30),heroeArmado.stats())
+  }
+
+  @Test
+  def heroeEquipaDosArmasDeUnaMano(){ 
+    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica)
+    assertEquals(Stats(20,55,30,30),heroeArmado.stats())
+  }
+  
+ 
+   @Test
+  def heroeNoPuedeEquiparTresArmas(){ //(10,20,30,40)->(20,35,30,30)->(20,45,30,30)->(20,55,30,30)
+    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica).equipar(espadaChica)
+    assertTrue(heroeArmado.inventario.items.length == 2) 
+    assertEquals(Stats(20,55,30,30),heroeArmado.stats())
+  }
+  
   
   @Test
   def equiparArmaduraEleganteSport(){

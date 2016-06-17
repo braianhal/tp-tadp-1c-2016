@@ -79,16 +79,20 @@ case class Inventario(items:List[Item] = List()){
   }
   
   def agregarItemDeMano(item:Item):List[Item] = {
-    var itemsActualizados = items.filterNot { _.tipo == Mano(true) }
+    var itemsActualizados = items.filterNot { _.tipo == Mano(true) } 
+    if(item.tipo == Mano(true)) return List(item)
+    
     if(items.count { _.tipo == Mano(false) } == 2){
       return reemplazarOAgregar(item,itemsActualizados)
     }
+
     item::itemsActualizados
   }
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
-    item::items.filterNot { _.tipo == item.tipo }
+    item::items.drop(1)
   }
+  
   
   def efectoSobre(heroe:Heroe):Heroe = {
     items.foldLeft(heroe)((heroe,item) => item.afectarA(heroe))
