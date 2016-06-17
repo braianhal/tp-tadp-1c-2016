@@ -28,6 +28,14 @@ package object efectos {
   
   def modificarVelocidad(delta:Int)(heroe:Heroe) =
     List(Velocidad(delta))
+    
+  def modificarFuerza(delta:Int)(heroe:Heroe) =
+    List(Fuerza(delta))
+    
+  def afectarPorMinimalismo(heroe:Heroe) = {
+    val itemsExtra = heroe.inventario.cantidadItems - 1
+    List(HP(+50),HP(-10*itemsExtra))
+  }
 }
 
 package object condiciones {
@@ -38,4 +46,10 @@ package object condiciones {
     
   def inteligenciaBaseMayorA(valor:Int)(heroe:Heroe) =
     heroe.inteligenciaBase > valor
+  
+  def aptoParaPalitoMagico(heroe:Heroe) =
+    heroe.es(Mago) || heroe.es(Ladron) && inteligenciaBaseMayorA(30)(heroe)
+    
+  def aptoParaEscudoAntiRobo(heroe:Heroe) =
+    !heroe.es(Ladron) && fuerzaBaseMayorA(20)(heroe)
 }

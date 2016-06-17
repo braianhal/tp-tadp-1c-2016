@@ -96,6 +96,7 @@ case class Inventario(items:List[Item] = List()){
   
   def tiene(item:Item) = items.contains(item)
   
+  def cantidadItems = items.length
 }
 
 
