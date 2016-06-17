@@ -1,5 +1,6 @@
 package domain
 
+
 case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Trabajo = SinTrabajo) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
 
   def fuerzaBase = statsBase.fuerza
@@ -67,8 +68,7 @@ case class Inventario(items:List[Item] = List()){
     actualizarInventario(heroe,
       item.tipo match {
         case Talisman => item::items
-        case Mano(false) => agregarItemDeMano(item)
-        case Mano(true) => agregarItemDeMano(item)
+        case Mano(_) => agregarItemDeMano(item)
         case _ => reemplazarOAgregar(item,items)
       })
   }
@@ -83,10 +83,6 @@ case class Inventario(items:List[Item] = List()){
       return reemplazarOAgregar(item,itemsActualizados)
     }
     item::itemsActualizados
-  }
-  
-  def soloUnItemDeMano(items:List[Item]):List[Item] = {
-    (items.find { _.tipo == Mano(false) }).get::items.filterNot { _.tipo == Mano(false) }
   }
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
