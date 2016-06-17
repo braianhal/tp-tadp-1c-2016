@@ -2,8 +2,8 @@
 *.log
 .cache-tests
 .cache-main
-.classpath
-.project
+# .classpath
+# .project
 .settings
 bin/
 

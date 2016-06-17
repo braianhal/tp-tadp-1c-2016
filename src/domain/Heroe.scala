@@ -2,8 +2,15 @@ package domain
 
 case class Heroe(statsBase:Stats) {
   
+  val inventario:Inventario = Inventario()
+  val trabajo:Trabajo = SinTrabajo
+  
   def modificarStats(variaciones:(Stat,Int)*) = {
     copy(statsBase.actualizarSegun(variaciones.toList))
+  }
+  
+  def stats(){
+    trabajo.modificarStats(statsBase)
   }
   
 }
@@ -25,6 +32,14 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   
   def actualizarStat(valorAnterior:Int,variacion:Int) = Math.max(1,variacion + valorAnterior)
 }
+
+case class Inventario(){
+  
+}
+
+abstract class Trabajo(statPrincipal:Stat,variacionStats:(Stat,Int)*)
+
+case class SinTrabajo() extends Trabajo(HP)
 
 class Stat
 case object HP extends Stat
