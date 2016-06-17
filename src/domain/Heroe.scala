@@ -2,12 +2,12 @@ package domain
 
 case class Heroe(statsBase:Stats,inventario:Inventario = Inventario()) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
 
-  val trabajo:Trabajo = null
+  val trabajo:Trabajo = null //FIXME
 
   
-  def modificarStats(variaciones:Stat*) = {
+  def modificarStats(variaciones:Stat*) = 
     copy(statsBase.actualizarSegun(variaciones.toList))
-  }
+  
   
   def equipar(item:Item):Heroe = {
     if(item.cumpleCondicion(this)){
@@ -43,8 +43,7 @@ case class Inventario(items:List[Item] = List()){
     actualizarInventario(heroe,
       item.tipo match {
         case Talisman => item::items
-        case Mano(false) => agregarItemDeMano(item)
-        case Mano(true) => agregarItemDeMano(item)
+        case Mano(_) => agregarItemDeMano(item)
         case _ => reemplazarOAgregar(item,items)
       })
   }
@@ -61,9 +60,9 @@ case class Inventario(items:List[Item] = List()){
     item::itemsActualizados
   }
   
-  def soloUnItemDeMano(items:List[Item]):List[Item] = {
-    (items.find { i => i.tipo == Mano(false) }).get::items.filterNot { i => i.tipo == Mano(false) }
-  }
+  //def soloUnItemDeMano(items:List[Item]):List[Item] = {
+  //  (items.find { i => i.tipo == Mano(false) }).get::items.filterNot { i => i.tipo == Mano(false) }
+  //}
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
     item::items.filterNot { i => i.tipo == item.tipo }
