@@ -1,6 +1,7 @@
 package domain
 
-case class Heroe(statsBase:Stats) {
+case class Heroe(statsBase:Stats) {  //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
+  
   
   val inventario:Inventario = Inventario()
   val trabajo:Trabajo = null
