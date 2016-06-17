@@ -1,12 +1,16 @@
 package domain
 
-case class Heroe(statsBase:Stats,inventario:Inventario = Inventario()) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
+case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Trabajo = SinTrabajo) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
 
-  val trabajo:Trabajo = null
-
+  def fuerzaBase = statsBase.fuerza
+  def velocidadBase = statsBase.velocidad
+  def inteligenciaBase = statsBase.inteligencia
+  def hpBase = statsBase.hp
+  
+  
   
   def modificarStats(variaciones:Stat*) = {
-    copy(statsBase.actualizarSegun(variaciones.toList))
+    copy(statsBase = statsBase.actualizarSegun(variaciones.toList))
   }
   
   def equipar(item:Item):Heroe = {
@@ -16,8 +20,13 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario()) { //hay q
     this
   }
   
+  def stats():Stats = inventario.efectoSobre(trabajo.efectoSobre(this)).statsBase
+  
   
 }
+
+
+
 
 case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   
@@ -37,6 +46,17 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   def actualizarStat(valorAnterior:Int,variacion:Int) = Math.max(1,variacion + valorAnterior)
 }
 
+
+abstract class Stat(valor:Int)
+case class HP(valor:Int) extends Stat(valor)
+case class Fuerza(valor:Int) extends Stat(valor)
+case class Velocidad(valor:Int) extends Stat(valor)
+case class Inteligencia(valor:Int) extends Stat(valor)
+
+
+
+
+
 case class Inventario(items:List[Item] = List()){
   
   def agregarA(heroe:Heroe,item:Item):Heroe = {
@@ -54,42 +74,37 @@ case class Inventario(items:List[Item] = List()){
   }
   
   def agregarItemDeMano(item:Item):List[Item] = {
-    var itemsActualizados = items.filterNot { i => i.tipo == Mano(true) }
-    if(items.count { i => i.tipo == Mano(false) } == 2){
+    var itemsActualizados = items.filterNot { _.tipo == Mano(true) }
+    if(items.count { _.tipo == Mano(false) } == 2){
       return reemplazarOAgregar(item,itemsActualizados)
     }
     item::itemsActualizados
   }
   
   def soloUnItemDeMano(items:List[Item]):List[Item] = {
-    (items.find { i => i.tipo == Mano(false) }).get::items.filterNot { i => i.tipo == Mano(false) }
+    (items.find { _.tipo == Mano(false) }).get::items.filterNot { _.tipo == Mano(false) }
   }
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
-    item::items.filterNot { i => i.tipo == item.tipo }
+    item::items.filterNot { _.tipo == item.tipo }
   }
   
+  def efectoSobre(heroe:Heroe):Heroe = {
+    items.foldLeft(heroe)((heroe,item) => item.afectarA(heroe))
+  }
+  
+  def tiene(item:Item) = items.contains(item)
+  
 }
 
-class Trabajo(statPrincipal:Stat,stats:List[Stat]){
-  
-  
-  
-}
 
-abstract class Stat(valor:Int)
-case class HP(valor:Int) extends Stat(valor)
-case class Fuerza(valor:Int) extends Stat(valor)
-case class Velocidad(valor:Int) extends Stat(valor)
-case class Inteligencia(valor:Int) extends Stat(valor)
-
-
-
-case class Item(tipo:TipoItem,efectoSobreHeroe:(Heroe => List[(Stat,Int)]),condicion:(Heroe => Boolean)) {
+case class Item(tipo:TipoItem,condicion:(Heroe => Boolean),efectoSobre:(Heroe => List[Stat])) {
   
   def cumpleCondicion(heroe:Heroe):Boolean = {
     condicion(heroe)
   }
+  
+  def afectarA(heroe:Heroe):Heroe = heroe.modificarStats(efectoSobre(heroe):_*)
   
 }
 
@@ -98,3 +113,32 @@ case object Cabeza extends TipoItem
 case object Torso extends TipoItem
 case class Mano(dosManos:Boolean = false) extends TipoItem
 case object Talisman extends TipoItem
+
+
+
+
+
+
+abstract class Trabajo {
+  def statsAfectados():List[Stat]
+  def efectoSobre(heroe:Heroe):Heroe
+}
+
+case class TrabajoEfectivo(val statPrincipal:Stat,val otrosStats:Stat*) extends Trabajo{
+  
+  override def statsAfectados = statPrincipal::otrosStats.toList
+  
+  override def efectoSobre(heroe:Heroe):Heroe = heroe.modificarStats(statsAfectados:_*)
+}
+
+case object SinTrabajo extends Trabajo {
+  def statsAfectados() = List()
+  def efectoSobre(heroe:Heroe):Heroe = heroe
+}
+
+
+
+
+
+
+
