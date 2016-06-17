@@ -73,6 +73,11 @@ class EquipoTest {
     assertEquals(None, equipoModificado.lider)
   }
   
+  @Test
+  def unEquipoDeUnSoloHeroeSeTieneASiMismoComoLider() = {
+    val equipito = Equipo("Equipito",100,List(desocupado))
+    assertEquals(Some(desocupado), equipito.lider)
+  } 
   
   
 }
