@@ -7,8 +7,6 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   def inteligenciaBase = statsBase.inteligencia
   def hpBase = statsBase.hp
   
-  
-  
   def modificarStats(variaciones:Stat*) = {
     copy(statsBase = statsBase.actualizarSegun(variaciones.toList))
   }
@@ -25,6 +23,8 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   def asignarTrabajo(trabajoNuevo:Trabajo) = copy(trabajo = trabajoNuevo)
   
   def perderTrabajo = asignarTrabajo(SinTrabajo)
+  
+  def es(unTrabajo:Trabajo) = trabajo == unTrabajo
 }
 
 
@@ -46,6 +46,8 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   }
   
   def actualizarStat(valorAnterior:Int,variacion:Int) = Math.max(1,variacion + valorAnterior)
+  
+  def toList = List(HP(hp),Fuerza(fuerza),Velocidad(velocidad),Inteligencia(inteligencia))
 }
 
 
@@ -100,7 +102,7 @@ case class Inventario(items:List[Item] = List()){
 }
 
 
-case class Item(tipo:TipoItem,condicion:(Heroe => Boolean),efectoSobre:(Heroe => List[Stat])) {
+case class Item(tipo:TipoItem,efectoSobre:(Heroe => List[Stat]),condicion:(Heroe => Boolean) = (_ => true)) {
   
   def cumpleCondicion(heroe:Heroe):Boolean = {
     condicion(heroe)

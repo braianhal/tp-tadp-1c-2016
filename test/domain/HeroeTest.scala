@@ -6,17 +6,17 @@ import org.junit.Assert._
 
 class HeroeTest {
   
-  var heroe:Heroe = null
-  var superHeroe:Heroe = null
-  var casiHeroe:Heroe = null
-  var cascoVikingo:Item = null
+  val heroe = Heroe(Stats(10,20,30,40))
+  val superHeroe = Heroe(Stats(100,100,100,100))
+  val casiHeroe = Heroe(Stats(5,5,5,5))
+  val cascoVikingo = Item(Cabeza,(_ => List(HP(+10))),(_.fuerzaBase > 30))
+  val palitoMagico = Item(Mano(),
+      (_ => List(HP(+20))),
+      (heroe => heroe.es(Mago) || (heroe.es(Ladron) && heroe.inteligenciaBase > 30)))
   
   @Before
   def setup() = {
-     heroe = Heroe(Stats(10,20,30,40))
-     superHeroe = Heroe(Stats(100,100,100,100))
-     casiHeroe = Heroe(Stats(5,5,5,5))
-     cascoVikingo = Item(Cabeza,(_.fuerzaBase > 30),(_ => List(HP(+10))))
+     
   }
   
   
@@ -133,5 +133,6 @@ class HeroeTest {
     assertFalse(casiHeroeSinCasco.inventario.tiene(cascoVikingo))
     assertEquals(casiHeroe.statsBase,casiHeroe.stats())
   }
+
   
 }
