@@ -2,14 +2,16 @@ package domain
 
 case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
   
-  def mejorHeroeSegun(cuantificador:(Heroe => Int)):Option[Heroe] = heroes.sortBy{ cuantificador(_) }.reverse.headOption
+  def ordenarHeroesSegun(cuantificador:(Heroe => Int)) = heroes.sortBy{ cuantificador(_) }.reverse
+  
+  def mejorHeroeSegun(cuantificador:(Heroe => Int)):Option[Heroe] = ordenarHeroesSegun(cuantificador).headOption
   
   def obtenerMiembro(nuevoMiembro:Heroe):Equipo = copy(heroes = nuevoMiembro::heroes)
   
   def reemplazarMiembro(actual:Heroe,nuevo:Heroe):Equipo = copy(heroes = nuevo::heroes.filterNot { _ == actual })
   
   def lider:Option[Heroe] = {
-    heroes.sortBy { _.valorStatPrincipal }.reverse match {
+    ordenarHeroesSegun { _.valorStatPrincipal} match {
       case List() => None
       case List(h) => Some(h)
       case h1::h2::hs => liderEntre(h1,h2)
@@ -25,7 +27,7 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
     }
   }
   
-  def cantidadMiembros = heroes.size
+  def cantidadMiembros = heroes.length
   
   def tieneA(heroe:Heroe) = heroes.contains(heroe)
   
