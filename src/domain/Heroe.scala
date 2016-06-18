@@ -16,7 +16,7 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   
   def equipar(item:Item):Heroe = {
     if(item.cumpleCondicion(this)){
-      return inventario.agregarA(this,item)
+      return copy(inventario = inventario.agregarA(this,item))
     }
     this
   }
@@ -33,7 +33,6 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
 
 
 
-// FIXME sospecho que sería mejor tener una lista de tuplas
 case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   
   def actualizarSegun(variaciones:List[Stat]) = {
@@ -67,7 +66,7 @@ case class Inteligencia(v:Int) extends Stat(v)
 
 case class Inventario(items:List[Item] = List()){
   
-  def agregarA(heroe:Heroe,item:Item):Heroe = {
+  def agregarA(heroe:Heroe,item:Item):Inventario = {
     actualizarInventario(heroe,
       item.tipo match {
         case Talisman => item::items
@@ -77,13 +76,12 @@ case class Inventario(items:List[Item] = List()){
       })
   }
   
-  def actualizarInventario(heroe:Heroe,itemsActualizados:List[Item]):Heroe = {
-    heroe.copy(inventario = copy(items = itemsActualizados))
+  def actualizarInventario(heroe:Heroe,itemsActualizados:List[Item]):Inventario = {
+    copy(items = itemsActualizados)
   }
   
   def agregarItemDeMano(item:Item):List[Item] = {
     var itemsActualizados = items.filterNot { _.tipo == Mano(true) } 
-    if(item.tipo == Mano(true)) return List(item)
     
     if(items.count { _.tipo == Mano(false) } == 2){
       return reemplazarOAgregar(item,itemsActualizados)
@@ -95,7 +93,7 @@ case class Inventario(items:List[Item] = List()){
   def sinItemsDeMano:List[Item] = items.filterNot { i => i.tipo == Mano(false) || i.tipo == Mano(true) }
   
   def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
-    item::items.drop(1)
+    item::items.drop(1)  //TODO mejorar
   }
   
   
