@@ -37,6 +37,28 @@ package object efectos {
     List(HP(+50),HP(-10*itemsExtra))
   }
   
+  def afectarPorDedicacion(heroe:Heroe) = {
+    heroe.stats().todosCon(heroe.valorStatPrincipal / 10)
+  }
+  
+  def efectoBufaloDeAgua(heroe:Heroe) = {
+    val stats = heroe.stats()
+    if(stats.fuerza > stats.inteligencia) {
+      List(Inteligencia(+30))
+    }
+    else{
+      stats.todosCon(+10).filterNot { stat => stat.getClass() == Inteligencia }
+    }
+  }
+  
+  def todosLosStatsEn(valorNuevo:Int)(heroe:Heroe):List[Stat] = {
+    heroe.stats().mapValores { valor => -(valor - valorNuevo) }.toList
+  }
+  
+  def igualarStats(stat:Stat,otroStat:Stat)(heroe:Heroe) = {
+    List(heroe.stats().modificar(otroStat,stat.valor))
+  }
+  
   def modificarTodos(delta:Int)(heroe:Heroe) = {
     List(HP(delta),Fuerza(delta),Velocidad(delta),Inteligencia(delta))
   }
@@ -56,4 +78,5 @@ package object condiciones {
     
   def aptoParaEscudoAntiRobo(heroe:Heroe) =
     !heroe.es(Ladron) && fuerzaBaseMayorA(20)(heroe)
+  
 }

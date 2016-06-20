@@ -40,15 +40,18 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
 case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   
   def actualizarSegun(variaciones:List[Stat]) = {
-    var nuevosStats:Stats = copy()
-    variaciones.foreach { variacion => 
-      variacion match {
+    variaciones.foldLeft(this)(aplicarVariacion)
+  }
+  
+  // TODO se podría hacer que reciba una función genérica actualizarStat (para que quede mejor en los efectos de los items)
+  def aplicarVariacion(stats:Stats,variacion:Stat):Stats = {
+    var nuevosStats:Stats = stats.copy()
+    variacion match {
         case HP(x) => nuevosStats = nuevosStats.copy(hp = actualizarStat(this.hp,x))
         case Fuerza(x) => nuevosStats = nuevosStats.copy(fuerza = actualizarStat(this.fuerza,x))
         case Velocidad(x) => nuevosStats = nuevosStats.copy(velocidad = actualizarStat(this.velocidad,x))
         case Inteligencia(x) => nuevosStats = nuevosStats.copy(inteligencia = actualizarStat(this.inteligencia,x))
       }
-    }
     nuevosStats
   }
   
@@ -57,6 +60,20 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   def toList = List(HP(hp),Fuerza(fuerza),Velocidad(velocidad),Inteligencia(inteligencia))
   
   def valorDe(stat:Stat) = this.toList.find { _.getClass() == stat.getClass() }.get.valor
+  
+  def todosCon(valor:Int) = this.copy(valor,valor,valor,valor).toList
+  
+  def mapValores(f:Int=>Int):Stats = {
+    copy(hp = f(hp),fuerza = f(fuerza), inteligencia = f(inteligencia),velocidad = f(velocidad))
+  }
+  
+  def modificar(unStat:Stat,nuevoValor:Int):Stat = 
+    unStat match {
+      case HP(x) => HP(nuevoValor)
+      case Fuerza(x) => Fuerza(nuevoValor)
+      case Velocidad(x) => Velocidad(nuevoValor)
+      case Inteligencia(x) => Inteligencia(nuevoValor)
+    }
 }
 
 

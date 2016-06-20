@@ -15,6 +15,11 @@ class HeroeTest {
   val armaduraEleganteSport = Item(Torso,10,( heroe => efectos.modificarVelocidad(+30)(heroe) ++ efectos.modificarHP(-30)(heroe)) )
   val arcoViejo = Item(Mano(true),10,efectos.modificarFuerza(+2))
   val escudoAntiRobo = Item(Mano(),10,efectos.modificarHP(+20),condiciones.aptoParaEscudoAntiRobo)
+  val talismanDedicacion = Item(Talisman,10,efectos.afectarPorDedicacion)
+  val talismanDelMinimalismo = Item(Talisman,10,efectos.afectarPorMinimalismo)
+  val vinchaDeBufaloDeAgua = Item(Cabeza,10,efectos.efectoBufaloDeAgua,(_ es SinTrabajo))
+  val talismanMaldito = Item(Talisman,10,efectos.todosLosStatsEn(1))
+  val espadaDeLaVida = Item(Mano(true),10,efectos.igualarStats(HP(0), Fuerza(0))) //TODO refactor de esto
   
   val bazooka = Item(Mano(true),10,( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),(heroe => heroe.es(Guerrero)))
   val espadaChica = Item(Mano(),10,efectos.modificarFuerza(+10),(heroe => (heroe.es(Guerrero))))
