@@ -13,6 +13,11 @@ class EquipoTest {
   
   val equipoVacio = Equipo("Equipo vacío",0,List())
   val equipo = Equipo("Equipo lleno",0,List(lider,mago,ladron))
+  val otroEquipo = Equipo("Un Equipo",0,List(mago,ladron))
+  
+  val cascoCaro = Item(Cabeza,300,efectos.modificarHP(+10))
+  val cascoDeFuerza = Item(Cabeza,300,efectos.modificarFuerza(+50))
+  val superCasco = Item(Cabeza,1000,efectos.modificarTodos(+10))
   
   @Before
   def setup() = {
@@ -78,6 +83,86 @@ class EquipoTest {
     val equipito = Equipo("Equipito",100,List(desocupado))
     assertEquals(Some(desocupado), equipito.lider)
   } 
+  
+  
+  // Manejo de ítems
+  @Test
+  def venderItemAumentaElPozo() = {
+    assertEquals(equipo.pozo + 300, equipo.vender(cascoCaro).pozo)
+  }
+  
+  @Test
+  def aHeroeLeSirveUnItemPorqueAumentaSuStatPrincipal() = {
+    assertTrue(lider.leSirve(cascoDeFuerza))
+  }
+  
+  @Test
+  def aHeroeNoLeSirveItemQueNoAumenteSuStatPrincipal() = {
+    assertFalse(mago.leSirve(cascoCaro))
+  }
+  
+  @Test
+  def aUnHeroeSinTrabajoNoLeSirveNingunItem() = {
+    assertFalse(desocupado.leSirve(superCasco))
+  }
+  
+  @Test
+  def elBeneficioDeUnItemQueSirveEsPositivo() = {
+    assertTrue(lider.beneficioDe(cascoDeFuerza) > 0)
+  }
+  
+  @Test
+  def elBeneficioDeUnItemQueNoSirveNoEsPositivo() = {
+    assertFalse(mago.beneficioDe(cascoDeFuerza) > 0)
+  }
+  
+  @Test
+  def unHeroeSinTrabajoSiempreTieneBeneficio0() = {
+    assertEquals(0,desocupado.beneficioDe(superCasco))
+  }
+  
+  @Test
+  def darleItemAUnMiembroProduceUnEfectoSobreElMismo() = {
+    val fuerzaActual = mago.stats().fuerza
+    
+    val equipoMejorado = equipo.darleItemA(mago, cascoDeFuerza)
+    val magoMejorado = equipoMejorado.obtenerLosQueSean(Mago).head
+    assertEquals(fuerzaActual+50, magoMejorado.stats().fuerza)
+  }
+  
+  @Test
+  def heroeAlQueMasLeSirveElStatPrincipal() = {
+    assertEquals(Some(lider), equipo.alQueMasLeSirve(cascoDeFuerza))
+  }
+  
+  @Test
+  def siElEquipoNoTieneHeroesANingunoLeSirve() = {
+    assertEquals(None, equipoVacio.alQueMasLeSirve(cascoDeFuerza))
+  }
+  
+  @Test
+  def siANingunoLeAumentaElStatPrincipalANadieLeSirve() = {
+    assertEquals(None, otroEquipo.alQueMasLeSirve(cascoDeFuerza))
+  }
+  
+  @Test
+  def alObtenerItemSeLoDaAlHeroeQueMasLeSirva() = {
+    val equipoEquipado = equipo.obtenerItem(cascoDeFuerza)
+    
+    val liderEquipado = equipoEquipado.obtenerLosQueSean(Guerrero).head
+    val magoSinEquipar = equipoEquipado.obtenerLosQueSean(Mago).head
+    assertEquals(lider.stats().fuerza + 50, liderEquipado.stats().fuerza)
+    assertEquals(mago.stats().fuerza, magoSinEquipar.stats().fuerza)
+  }
+  
+  @Test
+  def siANadieLeSirveUnItemSeVende() = {
+    val equipoNuevo = otroEquipo.obtenerItem(cascoDeFuerza)
+    
+    assertEquals(mago, equipoNuevo.obtenerLosQueSean(Mago).head)
+    assertEquals(ladron, equipoNuevo.obtenerLosQueSean(Ladron).head)
+    assertEquals(otroEquipo.pozo + 300, equipoNuevo.pozo)
+  }
   
   
 }

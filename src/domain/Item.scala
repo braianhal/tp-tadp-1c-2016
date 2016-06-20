@@ -1,6 +1,6 @@
 package domain
 
-case class Item(tipo:TipoItem, efectoSobre:efectos.EfectoHeroe, condicion:condiciones.CondicionHeroe = (_ => true)) {
+case class Item(tipo:TipoItem,valor:Int, efectoSobre:efectos.EfectoHeroe, condicion:condiciones.CondicionHeroe = (_ => true)) {
   
   def cumpleCondicion(heroe:Heroe):Boolean = {
     condicion(heroe)
@@ -35,6 +35,10 @@ package object efectos {
   def afectarPorMinimalismo(heroe:Heroe) = {
     val itemsExtra = heroe.inventario.cantidadItems - 1
     List(HP(+50),HP(-10*itemsExtra))
+  }
+  
+  def modificarTodos(delta:Int)(heroe:Heroe) = {
+    List(HP(delta),Fuerza(delta),Velocidad(delta),Inteligencia(delta))
   }
 }
 

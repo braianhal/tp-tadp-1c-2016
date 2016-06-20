@@ -29,6 +29,10 @@ case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Tr
   
   def valorStatPrincipal = trabajo.valorStatPrincipal(this)
   
+  def leSirve(item:Item) = beneficioDe(item) > 0
+  
+  def beneficioDe(item:Item) = this.equipar(item).valorStatPrincipal - this.valorStatPrincipal
+  
 }
 
 

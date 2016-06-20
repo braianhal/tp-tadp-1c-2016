@@ -23,5 +23,5 @@ case object Ladron extends TrabajoEfectivo(Velocidad(+10),HP(-5))
 case object SinTrabajo extends Trabajo {
   def statsAfectados() = List()
   def efectoSobre(heroe:Heroe):Heroe = heroe
-  def valorStatPrincipal(heroe:Heroe) = 1 // no sé si debería devolver el mínimo o un error
+  def valorStatPrincipal(heroe:Heroe) = 0
 }

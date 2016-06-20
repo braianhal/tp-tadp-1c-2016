@@ -10,15 +10,15 @@ class HeroeTest {
   val superHeroe = Heroe(Stats(100,100,100,100))
   val casiHeroe = Heroe(Stats(5,5,5,5))
   
-  val cascoVikingo = Item(Cabeza,efectos.modificarHP(+10),condiciones.fuerzaBaseMayorA(30))
-  val palitoMagico = Item(Mano(),efectos.modificarInteligencia(+20),condiciones.aptoParaPalitoMagico)
-  val armaduraEleganteSport = Item(Torso,( heroe => efectos.modificarVelocidad(+30)(heroe) ++ efectos.modificarHP(-30)(heroe)) )
-  val arcoViejo = Item(Mano(true),efectos.modificarFuerza(+2))
-  val escudoAntiRobo = Item(Mano(),efectos.modificarHP(+20),condiciones.aptoParaEscudoAntiRobo)
+  val cascoVikingo = Item(Cabeza,10,efectos.modificarHP(+10),condiciones.fuerzaBaseMayorA(30))
+  val palitoMagico = Item(Mano(),10,efectos.modificarInteligencia(+20),condiciones.aptoParaPalitoMagico)
+  val armaduraEleganteSport = Item(Torso,10,( heroe => efectos.modificarVelocidad(+30)(heroe) ++ efectos.modificarHP(-30)(heroe)) )
+  val arcoViejo = Item(Mano(true),10,efectos.modificarFuerza(+2))
+  val escudoAntiRobo = Item(Mano(),10,efectos.modificarHP(+20),condiciones.aptoParaEscudoAntiRobo)
   
-  val bazooka = Item(Mano(true),( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),(heroe => heroe.es(Guerrero)))
-  val espadaChica = Item(Mano(),efectos.modificarFuerza(+10),(heroe => (heroe.es(Guerrero))))
-  val lanza = Item(Mano(),( heroe => efectos.modificarVelocidad(+10)(heroe) ++ efectos.modificarFuerza(+10)(heroe)),(heroe => (heroe.es(Guerrero))))
+  val bazooka = Item(Mano(true),10,( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),(heroe => heroe.es(Guerrero)))
+  val espadaChica = Item(Mano(),10,efectos.modificarFuerza(+10),(heroe => (heroe.es(Guerrero))))
+  val lanza = Item(Mano(),10,( heroe => efectos.modificarVelocidad(+10)(heroe) ++ efectos.modificarFuerza(+10)(heroe)),(heroe => (heroe.es(Guerrero))))
   
   
   @Before
