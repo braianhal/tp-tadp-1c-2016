@@ -1,7 +1,7 @@
 package domain
 
 
-case class Heroe(statsBase:Stats,inventario:Inventario = Inventario(),trabajo:Trabajo = SinTrabajo) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
+case class Heroe(statsBase:Stats, inventario:Inventario = Inventario(), trabajo:Trabajo = SinTrabajo) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
 
   def fuerzaBase = statsBase.fuerza
   def velocidadBase = statsBase.velocidad
@@ -85,46 +85,49 @@ case class Inteligencia(v:Int) extends Stat(v)
 
 
 
-case class Inventario(items:List[Item] = List()){
+case class Inventario(cabeza:Item = null, torso:Item = null, manos:List[Item] = List(), talismanes:List[Item] = List()){
   
   def agregarA(heroe:Heroe,item:Item):Inventario = {
-    actualizarInventario(heroe,
       item.tipo match {
-        case Talisman => item::items
-        case Mano(false) => agregarItemDeMano(item)
-        case Mano(true) => item::sinItemsDeMano
-        case _ => reemplazarOAgregar(item,items)
-      })
-  }
-  
-  def actualizarInventario(heroe:Heroe,itemsActualizados:List[Item]):Inventario = {
-    copy(items = itemsActualizados)
+        case Talisman => copy(talismanes = item::talismanes)
+        case Mano(false) => copy(manos = agregarItemDeMano(item))
+        case Mano(true) => copy(manos = List(item))
+        case Cabeza => copy(cabeza = item)
+        case Torso => copy(torso = item)
+      }
   }
   
   def agregarItemDeMano(item:Item):List[Item] = {
-    var itemsActualizados = items.filterNot { _.tipo == Mano(true) } 
+    if (manos.length == 1 && manos.head.tipo == Mano(true))
+      return List(item)
     
-    if(items.count { _.tipo == Mano(false) } == 2){
-      return reemplazarOAgregar(item,itemsActualizados)
-    }
-
-    item::itemsActualizados
+    if(manos.length == 2)
+      return reemplazarItem(item,manos)
+ 
+    item::manos
   }
   
-  def sinItemsDeMano:List[Item] = items.filterNot { i => i.tipo == Mano(false) || i.tipo == Mano(true) }
-  
-  def reemplazarOAgregar(item:Item,items:List[Item]):List[Item] = {
-    item::items.drop(1)  //TODO mejorar
+  def reemplazarItem(item:Item, manos:List[Item]):List[Item] = {
+    item::manos.drop(1)  //TODO mejorar
   }
   
   
   def efectoSobre(heroe:Heroe):Heroe = {
-    items.foldLeft(heroe)((heroe,item) => item.afectarA(heroe))
+    todosLosItems.foldLeft(heroe)((heroe,item) => item.afectarA(heroe))
   }
   
-  def tiene(item:Item) = items.contains(item)
+  def todosLosItems:List[Item] = {
+    var items = manos ++ talismanes
+    if (cabeza != null)
+      items = cabeza::items
+    if (torso != null)
+      items = torso::items
+    items
+  }
   
-  def cantidadItems = items.length
+  def tiene(item:Item) = todosLosItems.contains(item)
+  
+  def cantidadItems = todosLosItems.length
 }
 
 

@@ -179,7 +179,7 @@ class HeroeTest {
     assertFalse(heroeArmado.inventario.tiene(bazooka))
     assertEquals(Stats(20,45,30,30),heroeArmado.stats())
   }
-
+  
   @Test
   def heroeEquipaUnArmaDeUnaManoYlaDescartaPorUnaDeDos(){ 
     val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(lanza).equipar(bazooka)
@@ -198,7 +198,7 @@ class HeroeTest {
    @Test
   def heroeNoPuedeEquiparTresArmas(){ //(10,20,30,40)->(20,35,30,30)->(20,45,30,30)->(20,55,30,30)
     val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica).equipar(espadaChica)
-    assertTrue(heroeArmado.inventario.items.length == 2) 
+    assertTrue(heroeArmado.inventario.cantidadItems == 2) 
     assertEquals(Stats(20,55,30,30),heroeArmado.stats())
   }
   
