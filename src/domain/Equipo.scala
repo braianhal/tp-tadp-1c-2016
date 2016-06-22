@@ -38,6 +38,7 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
     heroes.filter { _.leSirve(item) } match {
       case List() => None
       case heroesBeneficiados => Some(heroesBeneficiados.maxBy { _.beneficioDe(item) })
+ //     case heroesBeneficiados => mejorHeroeSegun { _.beneficioDe(item) }        verificar si esto lo reemplaza
     }
   }
   
