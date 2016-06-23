@@ -10,11 +10,14 @@ class MisionTest {
   val heroe2 = Heroe(Stats(1,2,1,4))
   
   val tarea = Tarea(((_,_) => 10),(_ => true),((a,b)=>b))
+  val tareaDificil = Tarea(((_,_) => 10),(_ => false),((a,b)=>b))
   val tareaAfecta = Tarea(((_,_) => 10),(_ => true),((a,b)=>b.reemplazarMiembro(a,heroe2)))
   val tareaFacilidad = Tarea(((h,e) => h.fuerzaBase + e.heroes.length ),(_ => true),((a,b)=>b))
   val equipo = Equipo("Equipo lleno",0,List(heroe))
   val equipoDeDos = equipo.obtenerMiembro(heroe2)
     
+  val misionDe1 = new Mision(List(tareaAfecta),(e => e))
+  val misionImposible = new Mision(List(tareaAfecta,tareaDificil),(e => e))
   
   @Test
   def equipoRealizaTarea() = {
@@ -44,9 +47,25 @@ class MisionTest {
     }
     assertEquals(heroeFinal,heroe)
   }
+  
+  //---------misiones
+   @Test
+  def equipoRealizaMisionyafectaheroe() = {
+     val e = misionDe1.realizarMision(equipo)
+    assertTrue(e.heroes.contains(heroe2))
+    assertEquals(e.heroes.length,1)
+    assertFalse(e.heroes.contains(heroe))
+  }
    
-   
-   
+  
+   @Test
+  def fracasanMisionImposible() = {
+     val e = misionImposible.realizarMision(equipo)
+    assertFalse(e.heroes.contains(heroe2))
+    assertEquals(e.heroes.length,1)
+    assertEquals(equipo,e)
+    assertTrue(e.heroes.contains(heroe))
+  }
    
    
    
