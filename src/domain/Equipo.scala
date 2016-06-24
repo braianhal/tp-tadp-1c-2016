@@ -46,6 +46,13 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
   
   def vender(item:Item):Equipo = copy(pozo = pozo + item.valor)
   
+  def realizar(mision:Mision):(Equipo,Tarea) = {
+	  mision.serRealizadaPor(this) match{
+	    case Exitosa(e,t) => (mision.recompensa(e),t)
+	    case Fallida(e,t,_) => (this,t)
+	  }
+  }
+  
   //para tests
   def cantidadMiembros = heroes.length
   def tieneA(heroe:Heroe) = heroes.contains(heroe)

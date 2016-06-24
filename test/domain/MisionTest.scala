@@ -25,8 +25,8 @@ class MisionTest {
   val equipoDeDos = equipo.obtenerMiembro(heroeDebil)
   val equipoDeTres = equipoDeDos.obtenerMiembro(heroeFuerte)
   
-  val misionDe1 = new Mision(List(tareaAfecta),(e => e))
-  val misionImposible = new Mision(List(tareaAfecta,tareaDificil),(e => e))
+  val misionDe1 = Mision(List(tareaAfecta),(e => e))
+  val misionImposible = Mision(List(tareaAfecta,tareaDificil),(e => e))
   
  @Test
   def equipoRealizaTareaSinEfecto() = {
@@ -96,7 +96,7 @@ class MisionTest {
   //---------misiones
    @Test
   def equipoRealizaMisionyafectaheroe() = {
-    val e = misionDe1.equipoAlrealizar(equipo)
+    val (e,_) = equipo.realizar(misionDe1)
     assertTrue(e.heroes.contains(heroeDebil))
     assertEquals(e.heroes.length,1)
     assertFalse(e.heroes.contains(heroeNormal))
@@ -105,7 +105,7 @@ class MisionTest {
   
    @Test
   def fracasanMisionImposible() = {
-     val e = misionImposible.equipoAlrealizar(equipo)
+     val (e,_) = equipo.realizar(misionImposible)
      assertFalse(e.heroes.contains(heroeDebil))
     assertEquals(e.heroes.length,1)
     assertEquals(equipo,e)
