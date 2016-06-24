@@ -31,16 +31,16 @@ case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 
 	def serRealizadaPor(equipo:Equipo):ResultadoMision =  {
 	  val estadoInicial:ResultadoMision = Exitosa(equipo,null)
-		val resultado = tareas.foldLeft(estadoInicial)((e,tarea) => tarea.realizar(e))
+		val resultado = tareas.foldLeft(estadoInicial)((e,tarea) => tarea.serRealizadaPor(e))
 		resultado.map { e => this.recompensa(e) }
 	}
 
 }
 
 
-case class Tarea(facilidad:((Heroe, Equipo) => Int), condicion:(Equipo => Boolean), efectoSobre:((Heroe,Equipo)=> Equipo)) {
+case class Tarea(facilidad:((Heroe, Equipo) => Int), efectoSobre:((Heroe,Equipo)=> Equipo), condicion:(Equipo => Boolean) = (_ => true)) {
   
-  def realizar(equipoEnMision:ResultadoMision):ResultadoMision = {
+  def serRealizadaPor(equipoEnMision:ResultadoMision):ResultadoMision = {
       equipoEnMision.filter { equipo => this.condicion(equipo)}
                     .flatMap { e => equipoConMejorHeroe(e) }
   }
@@ -62,9 +62,67 @@ case class Tarea(facilidad:((Heroe, Equipo) => Int), condicion:(Equipo => Boolea
     
   //--------para test---------
   def serRealizadaPorTest(equipo:Equipo) = {   
-    realizar(Exitosa(equipo,this))match{
+    serRealizadaPor(Exitosa(equipo,this)) match{
       case Exitosa(x,t) => x
       case _ => equipo
+    }
+  }
+  
+}
+
+
+package object tareas {
+  
+  type Efecto = (Heroe,Equipo)=> Equipo
+  type Facilidad = (Heroe, Equipo) => Int
+  type Condicion = (Equipo => Boolean)
+  
+  // efectos
+  def efectoMonstruo(fuerzaMonstruo:Int):Efecto = { (heroe,equipo) =>
+    if(heroe.stats().fuerza < 20){
+      afectarA(heroe,equipo,List(HP(-fuerzaMonstruo)))
+    }
+    equipo
+  }
+  
+  def efectoForzarPuerta:Efecto = { (heroe,equipo) =>
+    heroe.trabajo match {
+      case Mago => equipo
+      case Ladron => equipo
+      case _ => afectarA(heroe,equipo,List(Fuerza(+1),HP(-5)))
+    }
+  }
+  
+  def efectoRobarTalisman(talisman:Item):Efecto = { (_,equipo) => equipo.obtenerItem(talisman) }
+  
+  def afectarA(heroe:Heroe,equipo:Equipo,variaciones:List[Stat]):Equipo = {
+    equipo.reemplazarMiembro(heroe, heroe.modificarStats(variaciones:_*))
+  }
+  
+  // facilidades
+  def facilidadMonstruo:Facilidad = { (_,equipo) =>
+    equipo.lider match {
+      case Some(h) => h.trabajo match {
+        case Guerrero => 20
+        case _ => 10
+      }
+      case None => 10
+    }
+  }
+  
+  def facilidadPuerta:Facilidad = { (heroe,equipo) =>
+    heroe.stats().inteligencia + 10 * equipo.obtenerLosQueSean(Ladron).length
+  }
+  
+  def facilidadTalisman:Facilidad = { (heroe,_) =>
+    heroe.stats().velocidad
+  }
+  
+  // condiciones
+  def condicionTalisman:Condicion = { equipo =>
+    equipo.lider.map { _.trabajo } match {
+      case Some(Ladron) => true
+      case _ => false
     }
   }
   
