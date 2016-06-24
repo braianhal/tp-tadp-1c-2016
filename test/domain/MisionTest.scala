@@ -30,13 +30,13 @@ class MisionTest {
   
  @Test
   def equipoRealizaTareaSinEfecto() = {
-    val e2 = tarea.serRealizadaPor(equipo)
+    val e2 = tarea.serRealizadaPorTest(equipo)
     assertEquals(equipo,e2)
   }
   
    @Test
   def equipoRealizaTareayafectaheroe() = {
-    val e2 = tareaAfecta.serRealizadaPor(equipo)
+    val e2 = tareaAfecta.serRealizadaPorTest(equipo)
     assertTrue(e2.heroes.contains(heroeDebil))
     assertEquals(e2.heroes.length,1)
     assertFalse(e2.heroes.contains(heroeNormal))
@@ -60,7 +60,7 @@ class MisionTest {
   @Test
   def equipoNoPuedeRealizarUnaTareaPorFaltaDeEquipo() = {
    val error =  try {
-     pelearContraMonstruo.serRealizadaPor(equipo)
+     pelearContraMonstruo.serRealizadaPorTest(equipo)
    } catch {
      case t: Throwable => assertTrue(t.getMessage == "no la realizo")
    }
@@ -71,14 +71,14 @@ class MisionTest {
    
   @Test
   def equipoPeleaYelHeroeSeReemplaza() = {
-    val resultado = pelearContraMonstruo.serRealizadaPor(equipoDeDos)
+    val resultado = pelearContraMonstruo.serRealizadaPorTest(equipoDeDos)
     assertTrue(resultado.heroes.contains(heroeFuerte))
     assertEquals(resultado.heroes.length,2)    
   }
   
    @Test
   def equipoPeleaYelHeroeGanaUnCasco() = {
-    val resultado = peleaPorUnCasco.serRealizadaPor(equipoDeTres)
+    val resultado = peleaPorUnCasco.serRealizadaPorTest(equipoDeTres)
     assertTrue(resultado.heroes.contains(heroeDebil))
     assertTrue(resultado.heroes.contains(heroeNormal))
     assertEquals(resultado.heroes.length,3)
@@ -96,7 +96,7 @@ class MisionTest {
   //---------misiones
    @Test
   def equipoRealizaMisionyafectaheroe() = {
-    val e = misionDe1.realizarMision(equipo)
+    val e = misionDe1.equipoAlrealizar(equipo)
     assertTrue(e.heroes.contains(heroeDebil))
     assertEquals(e.heroes.length,1)
     assertFalse(e.heroes.contains(heroeNormal))
@@ -105,8 +105,8 @@ class MisionTest {
   
    @Test
   def fracasanMisionImposible() = {
-     val e = misionImposible.realizarMision(equipo)
-    assertFalse(e.heroes.contains(heroeDebil))
+     val e = misionImposible.equipoAlrealizar(equipo)
+     assertFalse(e.heroes.contains(heroeDebil))
     assertEquals(e.heroes.length,1)
     assertEquals(equipo,e)
     assertTrue(e.heroes.contains(heroeNormal))
