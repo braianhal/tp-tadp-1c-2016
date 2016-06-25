@@ -35,9 +35,9 @@ case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 		resultado.map { e => this.recompensa(e) }
 	}
 
-	def puedeRealizarMision(e:Equipo)={
+	//def puedeRealizarMision(e:Equipo)={
 	  
-	}
+	//}
 }
 
 
