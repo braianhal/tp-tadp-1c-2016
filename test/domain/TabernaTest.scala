@@ -25,7 +25,8 @@ class TabernaTest {
   val misionImposible = Mision(List(tarea,tareaImposible),(e => e))
   
   val taberna = Taberna(List(misionNula,misionSimple))
-  val tabernaDeMoe = Taberna(List(misionSimple,misionSimple,misionSimple,misionSimple))
+  val tabernaDeMoe = Taberna(List(misionImposible,misionImposible,misionImposible))
+  val tabernaVacia = Taberna(List())
   
   // ELEGIR MISION
   @Test
@@ -69,6 +70,16 @@ class TabernaTest {
   @Test
    def elegirMisionNoDevuelveNadaSiTodasFallan() = {
 	  assertEquals(None,tabernaDeMoe.elegirMision(superEquipo, criterioOro))
+  }
+  
+  @Test
+   def elegirMisionNoDevuelveNadaSiNoHayNinguna() = {
+	  assertEquals(None,tabernaVacia.elegirMision(superEquipo, criterioOro))
+  }
+  
+  @Test
+   def elegirMisionDevuelveLaMejorDeLasExitosas() = {
+	  assertEquals(Some(misionSimple),taberna.elegirMision(superEquipo, criterioOro))
   }
 
 }

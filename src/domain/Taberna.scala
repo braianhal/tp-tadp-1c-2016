@@ -1,30 +1,37 @@
 package domain
 
-class Taberna(misiones:List[Mision]) {
+case class Taberna(misiones:List[Mision]) {
   
   type Criterio = (Equipo,Equipo) => Boolean
   type MisionHecha = (Mision,ResultadoMision)
   
-  def elegirMision2(equipo:Equipo, criterio:Criterio):Option[Mision] = {
+  def elegirMision(equipo:Equipo, criterio:Criterio):Option[Mision] = {
     val resultados = misiones.map { mision => (mision,mision.serRealizadaPor(equipo)) }
-    mejorSegun2(criterio,resultados)
+    mejorSegun(criterio,resultados)
   }
   
-  def mejorSegun2(criterio:Criterio,resultados:List[MisionHecha]):Option[Mision] = {
+  def mejorSegun(criterio:Criterio,resultados:List[MisionHecha]):Option[Mision] = {
     resultados match {
       case List() => None
-      case x::xs => Some(xs.foldLeft(x)(elMejor2(criterio))._1)
+      case x::xs => exitosaONinguna(xs.foldLeft(x)(elMejor(criterio)))
+    }
+  }
+  
+  def exitosaONinguna(misionHecha:MisionHecha):Option[Mision] = {
+    misionHecha._2 match {
+      case Exitosa(_,_) => Some(misionHecha._1)
+      case _ => None
     }
   }
 
-  def elMejor2(criterio:Criterio)(m1:MisionHecha,m2:MisionHecha):MisionHecha = {
+  def elMejor(criterio:Criterio)(m1:MisionHecha,m2:MisionHecha):MisionHecha = {
     (m1._2,m2._2) match {
       case (Exitosa(e1,_),Exitosa(e2,_)) => if(criterio(e1,e2)) m1 else m2
       case (Fallida(_,_,_),Exitosa(_,_)) => m2
       case _ => m1
     }
   }
-   
+   /*
   def entrenar(equipo:Equipo,criterio:((Equipo,Equipo)=>Boolean)):ResultadoMision={
     val estadoInicial:ResultadoMision = Exitosa(equipo,null)
     misiones.foldLeft(estadoInicial){(r:ResultadoMision,m:Mision)=>
@@ -45,9 +52,9 @@ class Taberna(misiones:List[Mision]) {
     }
     estado //dummy
   }
-
+*/
   
-  
+  /*
  
   def elegirMision(equipo:Equipo, criterio:((Equipo,Equipo)=>Boolean),mision1:Mision,mision2:Mision):Option[Mision] = {
     val e1 = mision1.serRealizadaPor(equipo)
@@ -75,7 +82,7 @@ class Taberna(misiones:List[Mision]) {
     m1
     else 
     m2
- }
+ }*/
 } 
 
 
