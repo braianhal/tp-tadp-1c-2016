@@ -31,6 +31,20 @@ case class Taberna(misiones:List[Mision]) {
       case _ => m1
     }
   }
+  
+  def entrenar(equipo:Equipo,criterio:Criterio):Equipo = {
+    realizarMejorMision(equipo,criterio,misiones)
+  }
+  
+  def realizarMejorMision(equipo:Equipo,criterio:Criterio,misiones:List[Mision]):Equipo = {
+    elegirMision(equipo,criterio) match {
+      case Some(mision) => realizarMejorMision(equipo.realizar(mision)._1, criterio, sinMision(mision,misiones))
+      case _ => equipo
+    }
+  }
+  
+  def sinMision(mision:Mision,misiones:List[Mision]):List[Mision] = misiones.filterNot { m => m == mision }
+  
    /*
   def entrenar(equipo:Equipo,criterio:((Equipo,Equipo)=>Boolean)):ResultadoMision={
     val estadoInicial:ResultadoMision = Exitosa(equipo,null)
