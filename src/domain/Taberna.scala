@@ -37,7 +37,7 @@ case class Taberna(misiones:List[Mision]) {
   }
   
   def realizarMejorMision(equipo:Equipo,criterio:Criterio,misiones:List[Mision]):Equipo = {
-    elegirMision(equipo,criterio) match {
+     copy(misiones = misiones).elegirMision(equipo,criterio) match {
       case Some(mision) => realizarMejorMision(equipo.realizar(mision)._1, criterio, sinMision(mision,misiones))
       case _ => equipo
     }

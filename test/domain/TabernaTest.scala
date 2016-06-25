@@ -17,7 +17,7 @@ class TabernaTest {
   val equipoVacio = Equipo("Equipo vacío",0,List())
   val superEquipo = Equipo("Equipo lleno",100,List(lider,mago,ladron))
   
-  val tarea = Tarea(((_,_) => 10),((_,equipo)=>equipo.copy(pozo = 1000)))
+  val tarea = Tarea(((_,_) => 10),((_,equipo)=>equipo.copy(pozo = equipo.pozo+1000)))
   val tareaImposible = Tarea(((_,_) => 10),((a,b)=>b),(_ => false))
   
   val misionNula = Mision(List(),(equipo => equipo))
@@ -80,6 +80,24 @@ class TabernaTest {
   @Test
    def elegirMisionDevuelveLaMejorDeLasExitosas() = {
 	  assertEquals(Some(misionSimple),taberna.elegirMision(superEquipo, criterioOro))
+  }
+  
+  
+  // ENTRENAR
+  @Test
+   def entrenarSinMisionesNoProduceEfecto() = {
+	  assertEquals(superEquipo,tabernaVacia.entrenar(superEquipo, criterioOro))
+  }
+  
+  @Test
+   def entrenarConMisionesFallidasNoProduceEfecto() = {
+	  assertEquals(superEquipo,tabernaDeMoe.entrenar(superEquipo, criterioOro))
+  }
+  
+  @Test
+   def aumentaElOroAlEntrenar() = {
+    val equipoEntrenado = taberna.entrenar(superEquipo, criterioOro)
+	  assertEquals(superEquipo.pozo+1000,equipoEntrenado.pozo)
   }
 
 }
