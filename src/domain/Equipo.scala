@@ -48,7 +48,7 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
   
   def realizar(mision:Mision):(Equipo,Tarea) = {
 	  mision.serRealizadaPor(this) match{
-	    case Exitosa(e,t) => (mision.recompensa(e),t)
+	    case Exitosa(e,t) => (e,t)
 	    case Fallida(e,t,_) => (this,t)
 	  }
   }
