@@ -8,23 +8,29 @@ import scala.util.control.Exception
 trait ResultadoMision {
 	def equipo: Equipo
 	def map(f: (Equipo => Equipo)): ResultadoMision
-	def filter(f: (Equipo => Boolean)): ResultadoMision
+	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))): ResultadoMision
+	def filter(f: ((Equipo,Tarea) => Boolean)): ResultadoMision
 	def flatMap(f: (Equipo => ResultadoMision)): ResultadoMision
 	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T
 }
 
 case class Exitosa(val equipo: Equipo,tarea:Tarea) extends ResultadoMision {
 	def map(f: (Equipo => Equipo)) = Exitosa(f(equipo),tarea)
-			def filter(f: (Equipo => Boolean)) = if (f(equipo)) this else Fallida(equipo,tarea,"El equipo no cumplio la condicion")
-			def flatMap(f: (Equipo => ResultadoMision)) = f(equipo)
-			def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = f(equipo)
+	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))) = {
+	  val (tareaMapeada,equipoMapeado) = f(tarea,equipo)
+	  Exitosa(equipoMapeado,tareaMapeada)
+	}
+	def filter(f: ((Equipo,Tarea) => Boolean)) = if (f(equipo,tarea)) this else Fallida(equipo,tarea,"El equipo no cumplio la condicion")
+	def flatMap(f: (Equipo => ResultadoMision)) = f(equipo)
+	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = f(equipo)
 }
 
 case class Fallida(val equipo: Equipo,tarea:Tarea, descripcion: String) extends ResultadoMision {
 	def map(f: (Equipo => Equipo)) = this
-			def filter(f: (Equipo => Boolean)) = this
-			def flatMap(f: (Equipo => ResultadoMision)) = this
-			def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = e(equipo)
+	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))): ResultadoMision = this
+	def filter(t: ((Equipo,Tarea) => Boolean)) = this
+	def flatMap(f: (Equipo => ResultadoMision)) = this
+	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = e(equipo)
 }
 
 case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
@@ -32,7 +38,7 @@ case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 	def serRealizadaPor(equipo:Equipo):ResultadoMision =  {
 	  val estadoInicial:ResultadoMision = Exitosa(equipo,null)
 		val resultado = tareas.foldLeft(estadoInicial)((e,tarea) => tarea.serRealizadaPor(e))
-		resultado.map { e => this.recompensa(e) }
+		resultado.map (this.recompensa)
 	}
 
 	//def puedeRealizarMision(e:Equipo)={
@@ -44,9 +50,12 @@ case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 case class Tarea(facilidad:((Heroe, Equipo) => Int), efectoSobre:((Heroe,Equipo)=> Equipo), condicion:(Equipo => Boolean) = (_ => true)) {
   
   def serRealizadaPor(equipoEnMision:ResultadoMision):ResultadoMision = {
-      equipoEnMision.filter { equipo => this.condicion(equipo)}
+      equipoEnMision.map(asignar)
+                    .filter { (equipo,tarea) => tarea.condicion(equipo)}
                     .flatMap { e => equipoConMejorHeroe(e) }
   }
+      
+  val asignar:((Tarea,Equipo) => (Tarea,Equipo)) = { (_,e) => (this,e) }
   
   def equipoConMejorHeroe(equipo:Equipo):ResultadoMision = {
     this.mejorHeroeParaTarea(equipo) match{
