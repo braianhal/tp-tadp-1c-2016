@@ -12,6 +12,7 @@ trait ResultadoMision {
 	def filter(f: ((Equipo,Tarea) => Boolean)): ResultadoMision
 	def flatMap(f: (Equipo => ResultadoMision)): ResultadoMision
 	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T
+	def fallida = false
 }
 
 case class Exitosa(val equipo: Equipo,tarea:Tarea) extends ResultadoMision {
@@ -31,6 +32,7 @@ case class Fallida(val equipo: Equipo,tarea:Tarea, descripcion: String) extends 
 	def filter(t: ((Equipo,Tarea) => Boolean)) = this
 	def flatMap(f: (Equipo => ResultadoMision)) = this
 	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = e(equipo)
+	def fallida = true
 }
 
 case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
