@@ -37,13 +37,13 @@ case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 
 	def serRealizadaPor(equipo:Equipo):ResultadoMision =  {
 	  val estadoInicial:ResultadoMision = Exitosa(equipo,null)
-		val resultado = tareas.foldLeft(estadoInicial)((e,tarea) => tarea.serRealizadaPor(e))
-		resultado.map (this.recompensa)
+	  realizar(estadoInicial)
 	}
 
-	//def puedeRealizarMision(e:Equipo)={
-	  
-	//}
+	def realizar(r:ResultadoMision):ResultadoMision={   
+		val resultado = tareas.foldLeft(r)((e,tarea) => tarea.serRealizadaPor(e))
+		resultado.map (this.recompensa)
+		}
 }
 
 

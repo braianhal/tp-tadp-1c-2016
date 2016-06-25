@@ -29,6 +29,12 @@ class Taberna(misiones:List[Mision]) {
     else 
     m2
   }
+  
+  def entrenar(equipo:Equipo):ResultadoMision={
+    val estadoInicial:ResultadoMision = Exitosa(equipo,null)
+    misiones.foldLeft(estadoInicial)((r:ResultadoMision,m:Mision)=> m.realizar(r) )
+ 
+  }
 
   
 }
