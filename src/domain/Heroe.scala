@@ -1,7 +1,7 @@
 package domain
 
 
-case class Heroe(statsBase:Stats, inventario:Inventario = Inventario(), trabajo:Trabajo = SinTrabajo) { //hay que validar que no sean menores a 1.podemos ponerlos x default como 1 o tirar excepcion
+case class Heroe(statsBase:Stats, inventario:Inventario = Inventario(), trabajo:Trabajo = SinTrabajo) { 
 
   def fuerzaBase = statsBase.fuerza
   def velocidadBase = statsBase.velocidad
@@ -40,8 +40,7 @@ case class Stats(hp:Int,fuerza:Int,velocidad:Int,inteligencia:Int){
   def actualizarSegun(variaciones:List[Stat]) = {
     variaciones.foldLeft(this)(aplicarVariacion)
   }
-  
-  // TODO se podría hacer que reciba una función genérica actualizarStat (para que quede mejor en los efectos de los items)
+
   def aplicarVariacion(stats:Stats,variacion:Stat):Stats = {
     var nuevosStats:Stats = stats.copy()
     variacion match {
@@ -106,7 +105,7 @@ case class Inventario(cabeza:Item = null, torso:Item = null, manos:List[Item] = 
   }
   
   def reemplazarItem(item:Item, manos:List[Item]):List[Item] = {
-    item::manos.drop(1)  //TODO mejorar
+    item::manos.drop(1)  
   }
   
   

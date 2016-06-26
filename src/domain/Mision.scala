@@ -1,50 +1,41 @@
 package domain
 
-import scala.util.Success
-import scala.util.Try
-import scala.util.Failure
-import scala.util.control.Exception
+case class EstadoMision(equipo:Equipo,tarea:Tarea=null)
 
 trait ResultadoMision {
-	def equipo: Equipo
-	def map(f: (Equipo => Equipo)): ResultadoMision
-	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))): ResultadoMision
-	def filter(f: ((Equipo,Tarea) => Boolean)): ResultadoMision
-	def flatMap(f: (Equipo => ResultadoMision)): ResultadoMision
-	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T
-	def fallida = false
+	def map(f: (EstadoMision => EstadoMision)): ResultadoMision
+	def filter(f: (EstadoMision => Boolean)): ResultadoMision
+	def flatMap(f: (EstadoMision => ResultadoMision)): ResultadoMision
+	def fold[T](e: (EstadoMision => T))(f: (EstadoMision => T)): T
 }
 
-case class Exitosa(val equipo: Equipo,tarea:Tarea) extends ResultadoMision {
-	def map(f: (Equipo => Equipo)) = Exitosa(f(equipo),tarea)
-	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))) = {
-	  val (tareaMapeada,equipoMapeado) = f(tarea,equipo)
-	  Exitosa(equipoMapeado,tareaMapeada)
-	}
-	def filter(f: ((Equipo,Tarea) => Boolean)) = if (f(equipo,tarea)) this else Fallida(equipo,tarea,"El equipo no cumplio la condicion")
-	def flatMap(f: (Equipo => ResultadoMision)) = f(equipo)
-	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = f(equipo)
+case class Exitosa(estado:EstadoMision) extends ResultadoMision {
+	def map(f: (EstadoMision => EstadoMision)) = Exitosa(f(estado))
+	def filter(f: (EstadoMision => Boolean)) = if (f(estado)) this else Fallida(estado,"El equipo no cumplio la condicion")
+	def flatMap(f: (EstadoMision => ResultadoMision)) = f(estado)
+	def fold[T](e: (EstadoMision => T))(f: (EstadoMision => T)): T = f(estado)
 }
 
-case class Fallida(val equipo: Equipo,tarea:Tarea, descripcion: String) extends ResultadoMision {
-	def map(f: (Equipo => Equipo)) = this
-	def map(f: ((Tarea,Equipo) => (Tarea,Equipo))): ResultadoMision = this
-	def filter(t: ((Equipo,Tarea) => Boolean)) = this
-	def flatMap(f: (Equipo => ResultadoMision)) = this
-	def fold[T](e: (Equipo => T))(f: (Equipo => T)): T = e(equipo)
+case class Fallida(estado:EstadoMision, descripcion: String) extends ResultadoMision {
+	def map(f: (EstadoMision => EstadoMision)): ResultadoMision = this
+	def filter(t: (EstadoMision => Boolean)) = this
+	def flatMap(f: (EstadoMision => ResultadoMision)) = this
+	def fold[T](e: (EstadoMision => T))(f: (EstadoMision => T)): T = e(estado)
 }
 
 case class Mision(tareas:List[Tarea], recompensa: (Equipo => Equipo)) {
 
 	def serRealizadaPor(equipo:Equipo):ResultadoMision =  {
-	  val estadoInicial:ResultadoMision = Exitosa(equipo,null)
-	  realizar(estadoInicial)
+	  realizar(Exitosa(EstadoMision(equipo)))
 	}
 
 	def realizar(r:ResultadoMision):ResultadoMision={   
 		val resultado = tareas.foldLeft(r)((e,tarea) => tarea.serRealizadaPor(e))
-		resultado.map (this.recompensa)
-		}
+		resultado.map { obtenerRecompensa }
+	}
+	
+	val obtenerRecompensa:(EstadoMision => EstadoMision) = { estado => estado.copy(equipo = this.recompensa(estado.equipo)) }
+
 }
 
 
@@ -52,31 +43,31 @@ case class Tarea(facilidad:((Heroe, Equipo) => Int), efectoSobre:((Heroe,Equipo)
   
   def serRealizadaPor(equipoEnMision:ResultadoMision):ResultadoMision = {
       equipoEnMision.map(asignar)
-                    .filter { (equipo,tarea) => tarea.condicion(equipo)}
-                    .flatMap { e => equipoConMejorHeroe(e) }
+                    .filter { estado => estado.tarea.condicion(estado.equipo) }
+                    .flatMap { estado => equipoConMejorHeroe(estado) }
   }
       
-  val asignar:((Tarea,Equipo) => (Tarea,Equipo)) = { (_,e) => (this,e) }
+  val asignar:(EstadoMision => EstadoMision) = { estado => estado.copy(tarea = this) }
   
-  def equipoConMejorHeroe(equipo:Equipo):ResultadoMision = {
-    this.mejorHeroeParaTarea(equipo) match{
-      case Some(x) => Exitosa(efectoSobre(x,equipo),this)
-      case _ => Fallida(equipo,this,"Nadie puede realizarla")
+  def equipoConMejorHeroe(estado:EstadoMision):ResultadoMision = {
+    this.mejorHeroeParaTarea(estado.equipo) match{
+      case Some(heroe) => Exitosa(aplicarEfectoSobre(heroe,estado))
+      case _ => Fallida(estado,"Nadie puede realizarla")
     }
   }
   
   def mejorHeroeParaTarea(equipo:Equipo):Option[Heroe] = {
     equipo.mejorHeroeSegun { heroe => this.facilidad(heroe,equipo) } 
   }
-
-  def verificarCondicion(equipo:Option[Equipo]):Option[Equipo] = {
-    equipo.filter { equipo => this.condicion(equipo)}
+  
+  def aplicarEfectoSobre(heroe:Heroe,estadoMision:EstadoMision):EstadoMision = {
+    estadoMision.copy(equipo = efectoSobre(heroe,estadoMision.equipo))
   }
     
   //--------para test---------
   def serRealizadaPorTest(equipo:Equipo) = {   
-    serRealizadaPor(Exitosa(equipo,this)) match{
-      case Exitosa(x,t) => x
+    serRealizadaPor(Exitosa(EstadoMision(equipo,this))) match{
+      case Exitosa(EstadoMision(e,_)) => e
       case _ => equipo
     }
   }

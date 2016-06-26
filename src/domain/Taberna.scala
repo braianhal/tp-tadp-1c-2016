@@ -20,15 +20,15 @@ case class Taberna(misiones:List[Mision]) {
   
   def exitosaONinguna(misionHecha:MisionHecha):Option[Mision] = {
     misionHecha.resultado match {
-      case Exitosa(_,_) => Some(misionHecha.mision)
+      case Exitosa(_) => Some(misionHecha.mision)
       case _ => None
     }
   }
 
   def elMejor(criterio:Criterio)(m1:MisionHecha,m2:MisionHecha):MisionHecha = {
     (m1.resultado,m2.resultado) match {
-      case (Exitosa(e1,_),Exitosa(e2,_)) => if(criterio(e1,e2)) m1 else m2
-      case (Fallida(_,_,_),Exitosa(_,_)) => m2
+      case (Exitosa(estado1),Exitosa(estado2)) => if(criterio(estado1.equipo,estado2.equipo)) m1 else m2
+      case (Fallida(_,_),Exitosa(_)) => m2
       case _ => m1
     }
   }
@@ -39,7 +39,7 @@ case class Taberna(misiones:List[Mision]) {
   
   def realizarMejorMision(equipo:Equipo,criterio:Criterio,misiones:List[Mision]):Equipo = {
      copy(misiones = misiones).elegirMision(equipo,criterio) match {
-      case Some(mision) => realizarMejorMision(equipo.realizar(mision)._1, criterio, sinMision(mision,misiones))
+      case Some(mision) => realizarMejorMision(equipo.realizar(mision).equipo, criterio, sinMision(mision,misiones))
       case _ => equipo
     }
   }

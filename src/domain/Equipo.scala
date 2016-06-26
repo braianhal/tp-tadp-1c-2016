@@ -38,7 +38,6 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
     heroes.filter { _.leSirve(item) } match {
       case List() => None
       case heroesBeneficiados => Some(heroesBeneficiados.maxBy { _.beneficioDe(item) })
- //     case heroesBeneficiados => mejorHeroeSegun { _.beneficioDe(item) }        verificar si esto lo reemplaza
     }
   }
   
@@ -46,10 +45,10 @@ case class Equipo(nombre:String,pozo:Int,heroes:List[Heroe]) {
   
   def vender(item:Item):Equipo = copy(pozo = pozo + item.valor)
   
-  def realizar(mision:Mision):(Equipo,Tarea) = {
+  def realizar(mision:Mision):EstadoMision = {
 	  mision.serRealizadaPor(this) match{
-	    case Exitosa(e,t) => (e,t)
-	    case Fallida(e,t,_) => (this,t)
+	    case Exitosa(estado) => estado
+	    case Fallida(estado,_) => estado.copy(equipo = this)
 	  }
   }
   

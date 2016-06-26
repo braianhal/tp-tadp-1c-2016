@@ -49,8 +49,8 @@ class MisionTest {
   
   @Test
   def equipoFallaAlRealizarTareaSiNoCumpleCondicion() = {
-	  val resultado = robarTalisman.serRealizadaPor(Exitosa(equipoDeTres,null))
-	  assertEquals(Fallida(equipoDeTres,robarTalisman,descripcionNoCumpleCondicion),resultado)
+	  val resultado = robarTalisman.serRealizadaPor(Exitosa(EstadoMision(equipoDeTres)))
+	  assertEquals(Fallida(EstadoMision(equipoDeTres,robarTalisman),descripcionNoCumpleCondicion),resultado)
   }
 
   @Test
@@ -97,20 +97,20 @@ class MisionTest {
   //---------misiones
   @Test
   def equipoRealizaMisionyafectaheroe() = {
-	  val (e,_) = equipo.realizar(misionDe1)
-			  assertTrue(e.heroes.contains(heroeDebil))
-			  assertEquals(e.heroes.length,1)
-			  assertFalse(e.heroes.contains(heroeNormal))
+	  val e = equipo.realizar(misionDe1).equipo
+	  assertTrue(e.heroes.contains(heroeDebil))
+		assertEquals(e.heroes.length,1)
+		assertFalse(e.heroes.contains(heroeNormal))
   }
 
 
   @Test
   def fracasanMisionImposible() = {
-	  val (e,_) = equipo.realizar(misionImposible)
-			  assertFalse(e.heroes.contains(heroeDebil))
-			  assertEquals(e.heroes.length,1)
-			  assertEquals(equipo,e)
-			  assertTrue(e.heroes.contains(heroeNormal))
+	  val e = equipo.realizar(misionImposible).equipo
+		assertFalse(e.heroes.contains(heroeDebil))
+		assertEquals(e.heroes.length,1)
+		assertEquals(equipo,e)
+		assertTrue(e.heroes.contains(heroeNormal))
   }
 
 }
