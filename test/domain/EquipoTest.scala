@@ -6,9 +6,9 @@ import org.junit.Assert._
 
 class EquipoTest {
   
-  val lider = Heroe(Stats(50,50,50,50)).asignarTrabajo(Guerrero)
-  val mago = Heroe(Stats(30,20,30,15)).asignarTrabajo(Mago)
-  val ladron = Heroe(Stats(11,22,23,52)).asignarTrabajo(Ladron)
+  val lider = Heroe(Stats(50,50,50,50)).cambiarDeTrabajo(Guerrero)
+  val mago = Heroe(Stats(30,20,30,15)).cambiarDeTrabajo(Mago)
+  val ladron = Heroe(Stats(11,22,23,52)).cambiarDeTrabajo(Ladron)
   val desocupado = Heroe(Stats(16,8,4,2))
   
   val equipoVacio = Equipo("Equipo vacío",0,List())
@@ -73,7 +73,7 @@ class EquipoTest {
   
   @Test
   def siHayMasDeUnLiderNingunoLoEs() = {
-    val otroLider = Heroe(Stats(18,22,64,45)).asignarTrabajo(Mago)
+    val otroLider = Heroe(Stats(18,22,64,45)).cambiarDeTrabajo(Mago)
     val equipoModificado = equipo.obtenerMiembro(otroLider)
     assertEquals(None, equipoModificado.lider)
   }

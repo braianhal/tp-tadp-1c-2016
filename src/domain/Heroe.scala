@@ -21,9 +21,7 @@ case class Heroe(statsBase:Stats, inventario:Inventario = Inventario(), trabajo:
     this
   }
   
-  def asignarTrabajo(trabajoNuevo:Trabajo) = copy(trabajo = trabajoNuevo)
-  
-  def perderTrabajo = asignarTrabajo(SinTrabajo)
+  def cambiarDeTrabajo(trabajoNuevo:Trabajo) = copy(trabajo = trabajoNuevo)
   
   def es(unTrabajo:Trabajo) = trabajo == unTrabajo
   

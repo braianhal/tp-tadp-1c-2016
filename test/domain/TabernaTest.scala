@@ -7,9 +7,9 @@ import org.junit.Assert._
 
 class TabernaTest {
   
-  val lider = Heroe(Stats(50,50,50,50)).asignarTrabajo(Guerrero)
-  val mago = Heroe(Stats(30,20,30,15)).asignarTrabajo(Mago)
-  val ladron = Heroe(Stats(11,22,23,52)).asignarTrabajo(Ladron)
+  val lider = Heroe(Stats(50,50,50,50)).cambiarDeTrabajo(Guerrero)
+  val mago = Heroe(Stats(30,20,30,15)).cambiarDeTrabajo(Mago)
+  val ladron = Heroe(Stats(11,22,23,52)).cambiarDeTrabajo(Ladron)
   val desocupado = Heroe(Stats(16,8,4,2))
   
   val criterioOro:((Equipo,Equipo) => Boolean) = { (e1,e2) => e1.pozo > e2.pozo }
@@ -36,34 +36,34 @@ class TabernaTest {
   
   @Test
    def entreDosMisionesExitosasSeEligeLaMejor() = {
-    val unaMision = (misionNula,misionNula.serRealizadaPor(superEquipo))
-    val otraMision = (misionSimple,misionSimple.serRealizadaPor(superEquipo))
+    val unaMision = MisionHecha(misionNula,misionNula.serRealizadaPor(superEquipo))
+    val otraMision = MisionHecha(misionSimple,misionSimple.serRealizadaPor(superEquipo))
 	  assertEquals(otraMision,taberna.elMejor(criterioOro)(unaMision,otraMision))
   }
   
   @Test
    def entreUnaExitosaYUnaFallidaSeEligeLaExitosa() = {
-    val misionExitosa = (misionNula,misionNula.serRealizadaPor(superEquipo))
-    val misionFallida = (misionImposible,misionImposible.serRealizadaPor(superEquipo))
+    val misionExitosa = MisionHecha(misionNula,misionNula.serRealizadaPor(superEquipo))
+    val misionFallida = MisionHecha(misionImposible,misionImposible.serRealizadaPor(superEquipo))
 	  assertEquals(misionExitosa,taberna.elMejor(criterioOro)(misionExitosa,misionFallida))
   }
   
   @Test
    def eligeUnaDeLasFallidasSiAmbasLoSon() = {
-    val misionFallida = (misionImposible,misionImposible.serRealizadaPor(superEquipo))
+    val misionFallida = MisionHecha(misionImposible,misionImposible.serRealizadaPor(superEquipo))
     val misionFallida2 = misionFallida.copy()
 	  assertEquals(misionFallida,taberna.elMejor(criterioOro)(misionFallida,misionFallida2))
   }
   
   @Test
    def siLaMisionElegidaNoEsExitosaNoSeDevuelve() = {
-    val misionFallida = (misionImposible,misionImposible.serRealizadaPor(superEquipo))
+    val misionFallida = MisionHecha(misionImposible,misionImposible.serRealizadaPor(superEquipo))
 	  assertEquals(None,taberna.exitosaONinguna(misionFallida))
   }
   
   @Test
    def siLaMisionElegidaEsExitosaSeDevuelve() = {
-    val misionExitosa = (misionNula,misionNula.serRealizadaPor(superEquipo))
+    val misionExitosa = MisionHecha(misionNula,misionNula.serRealizadaPor(superEquipo))
 	  assertEquals(Some(misionNula),taberna.exitosaONinguna(misionExitosa))
   }
   

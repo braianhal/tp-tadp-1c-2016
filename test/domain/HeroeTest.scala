@@ -19,7 +19,7 @@ class HeroeTest {
   val talismanDelMinimalismo = Item(Talisman,10,efectos.afectarPorMinimalismo)
   val vinchaDeBufaloDeAgua = Item(Cabeza,10,efectos.efectoBufaloDeAgua,List((_ es SinTrabajo)))
   val talismanMaldito = Item(Talisman,10,efectos.todosLosStatsEn(1))
-  val espadaDeLaVida = Item(Mano(true),10,efectos.igualarStats(HP(0), Fuerza(0))) //TODO refactor de esto
+  val espadaDeLaVida = Item(Mano(true),10,efectos.igualarStats(HP(0), Fuerza(0)))
   
   val bazooka = Item(Mano(true),10,( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),List((_ es Guerrero)))
   val espadaChica = Item(Mano(),10,efectos.modificarFuerza(+10),List((_ es Guerrero)))
@@ -91,13 +91,13 @@ class HeroeTest {
   //Trabajo
   @Test
   def noTenerTrabajoNoCambiaLosStats(){
-    val heroeSinTrabajo = heroe.perderTrabajo
+    val heroeSinTrabajo = heroe.cambiarDeTrabajo(SinTrabajo)
     assertEquals(heroeSinTrabajo.statsBase,heroeSinTrabajo.stats())
   }
   
   @Test
   def heroeConTrabajoDeGuerrero(){
-    val heroeConTrabajo = heroe.asignarTrabajo(Guerrero)
+    val heroeConTrabajo = heroe.cambiarDeTrabajo(Guerrero)
     assertEquals(heroeConTrabajo.hpBase+10,heroeConTrabajo.stats().hp)
     assertEquals(heroeConTrabajo.fuerzaBase+15,heroeConTrabajo.stats().fuerza)
     assertEquals(heroeConTrabajo.inteligenciaBase-10,heroeConTrabajo.stats().inteligencia)
@@ -106,7 +106,7 @@ class HeroeTest {
   
   @Test
   def heroeConTrabajoDeMago(){
-    val heroeConTrabajo = heroe.asignarTrabajo(Mago)
+    val heroeConTrabajo = heroe.cambiarDeTrabajo(Mago)
     assertEquals(heroeConTrabajo.hpBase,heroeConTrabajo.stats().hp)
     assertEquals(1,heroeConTrabajo.stats().fuerza) // daría 0, pero el mínimo es 1
     assertEquals(heroeConTrabajo.inteligenciaBase+20,heroeConTrabajo.stats().inteligencia)
@@ -115,7 +115,7 @@ class HeroeTest {
   
   @Test
   def heroeConTrabajoDeLadron(){
-    val heroeConTrabajo = heroe.asignarTrabajo(Ladron)
+    val heroeConTrabajo = heroe.cambiarDeTrabajo(Ladron)
     assertEquals(heroeConTrabajo.hpBase-5,heroeConTrabajo.stats().hp)
     assertEquals(heroeConTrabajo.fuerzaBase,heroeConTrabajo.stats().fuerza) // daría 0, pero el mínimo es 1
     assertEquals(heroeConTrabajo.inteligenciaBase,heroeConTrabajo.stats().inteligencia)
@@ -124,8 +124,8 @@ class HeroeTest {
   
   @Test
   def quedarseSinTrabajo(){
-    val heroeConTrabajo = heroe.asignarTrabajo(Ladron)
-    val heroeSinTrabajo = heroeConTrabajo.perderTrabajo
+    val heroeConTrabajo = heroe.cambiarDeTrabajo(Ladron)
+    val heroeSinTrabajo = heroeConTrabajo.cambiarDeTrabajo(SinTrabajo)
     
     assertNotEquals(heroeConTrabajo.statsBase,heroeConTrabajo.stats())
     assertEquals(heroeSinTrabajo.statsBase,heroeSinTrabajo.stats())
@@ -148,7 +148,7 @@ class HeroeTest {
 
   @Test
   def magoEquipaPalitoMagico(){
-    val magoConPalitoMagico = superHeroe.asignarTrabajo(Mago).equipar(palitoMagico)
+    val magoConPalitoMagico = superHeroe.cambiarDeTrabajo(Mago).equipar(palitoMagico)
     assertEquals(superHeroe.inteligenciaBase + 20 + 20, magoConPalitoMagico.stats().inteligencia)
   }
   
@@ -161,20 +161,20 @@ class HeroeTest {
   
   @Test
   def noCumpleCondicionParaEquiparPalitoMagico2(){
-    val otroHeroe = casiHeroe.asignarTrabajo(Ladron).equipar(palitoMagico)
+    val otroHeroe = casiHeroe.cambiarDeTrabajo(Ladron).equipar(palitoMagico)
     assertFalse(otroHeroe.inventario.tiene(palitoMagico))
   }
   
   @Test
   def ladronEquipaPalitoMagico(){
-    val ladronConPalitoMagico = superHeroe.asignarTrabajo(Ladron).equipar(palitoMagico)
+    val ladronConPalitoMagico = superHeroe.cambiarDeTrabajo(Ladron).equipar(palitoMagico)
     assertEquals(superHeroe.inteligenciaBase + 20, ladronConPalitoMagico.stats().inteligencia)
   }
   
   
   @Test
   def heroeEquipaUnArmaDeDosManosYlaDescartaPorUna(){ 
-    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(bazooka).equipar(espadaChica)
+    val heroeArmado = heroe.cambiarDeTrabajo(Guerrero).equipar(bazooka).equipar(espadaChica)
     assertTrue(heroeArmado.inventario.tiene(espadaChica))
     assertFalse(heroeArmado.inventario.tiene(bazooka))
     assertEquals(Stats(20,45,30,30),heroeArmado.stats())
@@ -182,7 +182,7 @@ class HeroeTest {
   
   @Test
   def heroeEquipaUnArmaDeUnaManoYlaDescartaPorUnaDeDos(){ 
-    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(lanza).equipar(bazooka)
+    val heroeArmado = heroe.cambiarDeTrabajo(Guerrero).equipar(lanza).equipar(bazooka)
     assertTrue(heroeArmado.inventario.tiene(bazooka))
     assertFalse(heroeArmado.inventario.tiene(lanza))
     assertEquals(Stats(20,135,1,30),heroeArmado.stats())
@@ -190,14 +190,14 @@ class HeroeTest {
 
   @Test
   def heroeEquipaDosArmasDeUnaMano(){ 
-    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica)
+    val heroeArmado = heroe.cambiarDeTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica)
     assertEquals(Stats(20,55,30,30),heroeArmado.stats())
   }
   
  
    @Test
   def heroeNoPuedeEquiparTresArmas(){ //(10,20,30,40)->(20,35,30,30)->(20,45,30,30)->(20,55,30,30)
-    val heroeArmado = heroe.asignarTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica).equipar(espadaChica)
+    val heroeArmado = heroe.cambiarDeTrabajo(Guerrero).equipar(espadaChica).equipar(espadaChica).equipar(espadaChica)
     assertTrue(heroeArmado.inventario.cantidadItems == 2) 
     assertEquals(Stats(20,55,30,30),heroeArmado.stats())
   }
