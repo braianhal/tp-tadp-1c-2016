@@ -11,7 +11,7 @@ class MisionTest {
   val heroeDebil = Heroe(Stats(1,2,1,4))
   val heroeFuerte = Heroe(Stats(100,100,100,100))
 
-  val cascoVikingo = Item(Cabeza,10,efectos.modificarHP(+10),condiciones.fuerzaBaseMayorA(30))
+  val cascoVikingo = Item(Cabeza,10,efectos.modificarHP(+10),List(condiciones.fuerzaBaseMayorA(30)))
   
   val tarea = Tarea(((_,_) => 10),((a,b)=>b))
   val tareaAfecta = Tarea(((_,_) => 10),((a,b)=>b.reemplazarMiembro(a,heroeDebil)))

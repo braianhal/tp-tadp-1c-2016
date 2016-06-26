@@ -1,9 +1,9 @@
 package domain
 
-case class Item(tipo:TipoItem,valor:Int, efectoSobre:efectos.EfectoHeroe, condicion:condiciones.CondicionHeroe = (_ => true)) {
+case class Item(tipo:TipoItem,valor:Int, efectoSobre:efectos.EfectoHeroe, listaCondiciones:List[condiciones.CondicionHeroe] = List ((_ => true))) {
   
   def cumpleCondicion(heroe:Heroe):Boolean = {
-    condicion(heroe)
+    listaCondiciones.forall( condicion => condicion(heroe) )
   }
   
   def afectarA(heroe:Heroe):Heroe = heroe.modificarStats(efectoSobre(heroe):_*)

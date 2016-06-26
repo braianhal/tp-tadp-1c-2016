@@ -10,20 +10,20 @@ class HeroeTest {
   val superHeroe = Heroe(Stats(100,100,100,100))
   val casiHeroe = Heroe(Stats(5,5,5,5))
   
-  val cascoVikingo = Item(Cabeza,10,efectos.modificarHP(+10),condiciones.fuerzaBaseMayorA(30))
-  val palitoMagico = Item(Mano(),10,efectos.modificarInteligencia(+20),condiciones.aptoParaPalitoMagico)
+  val cascoVikingo = Item(Cabeza,10,efectos.modificarHP(+10),List(condiciones.fuerzaBaseMayorA(30)))
+  val palitoMagico = Item(Mano(),10,efectos.modificarInteligencia(+20),List(condiciones.aptoParaPalitoMagico))
   val armaduraEleganteSport = Item(Torso,10,( heroe => efectos.modificarVelocidad(+30)(heroe) ++ efectos.modificarHP(-30)(heroe)) )
   val arcoViejo = Item(Mano(true),10,efectos.modificarFuerza(+2))
-  val escudoAntiRobo = Item(Mano(),10,efectos.modificarHP(+20),condiciones.aptoParaEscudoAntiRobo)
+  val escudoAntiRobo = Item(Mano(),10,efectos.modificarHP(+20),List(condiciones.aptoParaEscudoAntiRobo))
   val talismanDedicacion = Item(Talisman,10,efectos.afectarPorDedicacion)
   val talismanDelMinimalismo = Item(Talisman,10,efectos.afectarPorMinimalismo)
-  val vinchaDeBufaloDeAgua = Item(Cabeza,10,efectos.efectoBufaloDeAgua,(_ es SinTrabajo))
+  val vinchaDeBufaloDeAgua = Item(Cabeza,10,efectos.efectoBufaloDeAgua,List((_ es SinTrabajo)))
   val talismanMaldito = Item(Talisman,10,efectos.todosLosStatsEn(1))
   val espadaDeLaVida = Item(Mano(true),10,efectos.igualarStats(HP(0), Fuerza(0))) //TODO refactor de esto
   
-  val bazooka = Item(Mano(true),10,( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),(heroe => heroe.es(Guerrero)))
-  val espadaChica = Item(Mano(),10,efectos.modificarFuerza(+10),(heroe => (heroe.es(Guerrero))))
-  val lanza = Item(Mano(),10,( heroe => efectos.modificarVelocidad(+10)(heroe) ++ efectos.modificarFuerza(+10)(heroe)),(heroe => (heroe.es(Guerrero))))
+  val bazooka = Item(Mano(true),10,( heroe => efectos.modificarFuerza(+100)(heroe) ++ efectos.modificarVelocidad(-30)(heroe)),List((_ es Guerrero)))
+  val espadaChica = Item(Mano(),10,efectos.modificarFuerza(+10),List((_ es Guerrero)))
+  val lanza = Item(Mano(),10,( heroe => efectos.modificarVelocidad(+10)(heroe) ++ efectos.modificarFuerza(+10)(heroe)),List((_ es Guerrero)))
   
   
   @Before
